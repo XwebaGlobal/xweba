@@ -1,0 +1,150 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { StudioTeam } from './components/StudioTeam';
+import { ServicesBento } from './components/ServicesBento';
+import { WorkShowcase } from './components/WorkShowcase';
+import { GeoAuditor } from './components/GeoAuditor';
+import { ScopeCalculator } from './components/ScopeCalculator';
+import { PerformanceBenchmark } from './components/PerformanceBenchmark';
+import { ProcessTimeline } from './components/ProcessTimeline';
+import { Footer } from './components/Footer';
+import { ConsultationModal } from './components/ConsultationModal';
+import { CommandPalette } from './components/CommandPalette';
+import { ServiceItem } from './types';
+
+export default function App() {
+  const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [consultationPreload, setConsultationPreload] = useState<{
+    serviceName?: string;
+    estimatedCost?: string;
+    timeline?: string;
+    modules?: string[];
+    domain?: string;
+  }>({});
+
+  // Global Keyboard listener for Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleOpenConsultation = (initial?: typeof consultationPreload) => {
+    if (initial) {
+      setConsultationPreload(initial);
+    } else {
+      setConsultationPreload({});
+    }
+    setIsConsultationOpen(true);
+  };
+
+  const handleScrollToEstimator = () => {
+    const el = document.getElementById('scope-calculator');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollToGeoAudit = () => {
+    const el = document.getElementById('geo-audit');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleSelectServiceFromBento = (service: ServiceItem) => {
+    handleOpenConsultation({
+      serviceName: service.title,
+      estimatedCost: 'Custom quote based on scope',
+      timeline: '3–5 weeks'
+    });
+  };
+
+  const handleRemediateGeoDomain = (domain: string) => {
+    handleOpenConsultation({
+      serviceName: 'Generative Engine Optimization (GEO) Remediation',
+      domain: domain,
+      estimatedCost: '$2,400 - $4,800',
+      timeline: '3 weeks'
+    });
+  };
+
+  const handlePreloadFromEstimator = (data: {
+    serviceName: string;
+    estimatedCost: string;
+    timeline: string;
+    modules: string[];
+  }) => {
+    handleOpenConsultation(data);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#071520] text-[#ededed] font-sans selection:bg-[#FF5E14] selection:text-white">
+      {/* 3-Zone Top Bar Navigation with Hostinger Partner Banner */}
+      <Navbar
+        onOpenConsultation={() => handleOpenConsultation()}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+      />
+
+      <main>
+        {/* Authentic Hero with Team Portrait & Brand Narrative */}
+        <Hero
+          onOpenConsultation={() => handleOpenConsultation()}
+          onScrollToEstimator={handleScrollToEstimator}
+          onScrollToGeoAudit={handleScrollToGeoAudit}
+        />
+
+        {/* Studio Culture & Craftsmanship: Strategy · Design · Growth */}
+        <StudioTeam onOpenConsultation={() => handleOpenConsultation()} />
+
+        {/* Capabilities Deck with Interactive Detail Inspector */}
+        <ServicesBento onSelectService={handleSelectServiceFromBento} />
+
+        {/* Selected Work & Case Studies with Interactive Modal */}
+        <WorkShowcase onOpenConsultation={() => handleOpenConsultation()} />
+
+        {/* Interactive GEO & AI Citability Diagnostic Simulator */}
+        <GeoAuditor onRemediate={handleRemediateGeoDomain} />
+
+        {/* Interactive Scope & Investment Calculator */}
+        <ScopeCalculator onPreloadBrief={handlePreloadFromEstimator} />
+
+        {/* Interactive Speed & Pipeline Loss Simulator */}
+        <PerformanceBenchmark onOpenConsultation={() => handleOpenConsultation()} />
+
+        {/* Clear 4-Week Delivery Methodology & FAQs */}
+        <ProcessTimeline />
+      </main>
+
+      {/* Quiet, Unboxed Footer */}
+      <Footer onOpenConsultation={() => handleOpenConsultation()} />
+
+      {/* Interactive Consultation / Discovery Brief Dialog */}
+      <ConsultationModal
+        isOpen={isConsultationOpen}
+        onClose={() => setIsConsultationOpen(false)}
+        initialData={consultationPreload}
+      />
+
+      {/* Quick Navigator / Command Palette (Cmd + K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onOpenConsultation={() => handleOpenConsultation()}
+      />
+    </div>
+  );
+}
