@@ -1,224 +1,201 @@
-import React, { useState, useMemo } from 'react';
-import { Gauge, TrendingUp, AlertTriangle, ArrowRight, Zap, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Zap, AlertCircle, ArrowUpRight, CheckCircle2, TrendingDown, DollarSign } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface PerformanceBenchmarkProps {
   onOpenConsultation: () => void;
 }
 
 export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOpenConsultation }) => {
-  const [monthlyVisitors, setMonthlyVisitors] = useState<number>(15000);
-  const [dealValue, setDealValue] = useState<number>(2500);
+  const [monthlyVisitors, setMonthlyVisitors] = useState<number>(25000);
+  const [avgOrderValue, setAvgOrderValue] = useState<number>(150);
+  const { isDark } = useTheme();
 
-  const stats = useMemo(() => {
-    // Google research: Every 1s delay in mobile load decreases conversions by ~20%
-    const legacyConversionRate = 0.012; // 1.2%
-    const xwebaConversionRate = 0.034; // 3.4%
+  // Amazon/Google research: every 100ms delay costs ~1% conversions; 3s+ delay costs 7% bounce rate
+  // Let's calculate pipeline revenue preserved with XwebA's sub-second edge hosting vs slow 3.5s WordPress baseline
+  const baselineBounceRate = 0.42; // 42% on slow 3.5s
+  const xwebABounceRate = 0.18; // 18% on 600ms edge
+  const conversionRate = 0.024; // 2.4% baseline
 
-    const legacyInquiries = Math.round(monthlyVisitors * legacyConversionRate);
-    const xwebaInquiries = Math.round(monthlyVisitors * xwebaConversionRate);
-
-    const lostInquiries = xwebaInquiries - legacyInquiries;
-    const estimatedLostRevenue = lostInquiries * (dealValue * 0.25); // assuming 25% close rate on inquiries
-
-    return {
-      legacyInquiries,
-      xwebaInquiries,
-      lostInquiries,
-      estimatedLostRevenue: Math.round(estimatedLostRevenue)
-    };
-  }, [monthlyVisitors, dealValue]);
+  const retainedTrafficMonthly = Math.round(monthlyVisitors * (baselineBounceRate - xwebABounceRate));
+  const recoveredSalesMonthly = Math.round(retainedTrafficMonthly * conversionRate);
+  const recoveredRevenueMonthly = Math.round(recoveredSalesMonthly * avgOrderValue);
+  const recoveredRevenueAnnual = recoveredRevenueMonthly * 12;
 
   return (
-    <section id="performance" className="relative py-20 lg:py-28 border-b border-neutral-800 bg-[#090a0b]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="performance" className={`relative w-full py-20 lg:py-28 border-b transition-colors ${
+      isDark ? 'border-neutral-800 bg-[#071520]' : 'border-slate-200 bg-[#f8fafc]'
+    }`}>
+      {/* Ambient color blend */}
+      <div className={`absolute top-1/4 left-1/4 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#009fe3]/10' : 'bg-[#009fe3]/06'
+      }`} />
+      <div className={`absolute bottom-0 right-1/4 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#FF5E14]/10' : 'bg-[#FF5E14]/06'
+      }`} />
+
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
-        {/* Header */}
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-            <span>The Cost of Latency</span>
-            <span aria-hidden="true" className="text-neutral-600">·</span>
-            <span className="text-[#ff3b00]">Quantitative Business Impact</span>
+        {/* Section Header */}
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-12 transition-colors ${
+          isDark ? 'border-neutral-800' : 'border-slate-200'
+        }`}>
+          <div className="max-w-3xl">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#009fe3] font-semibold">
+              Latency & Pipeline Simulator
+            </span>
+            <h2 className={`mt-2 font-display text-3xl sm:text-5xl font-bold tracking-tight transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Slow load times are quietly draining your customer acquisition budget.
+            </h2>
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Slow architectures silently destroy qualified pipeline.
-          </h2>
-          <p className="mt-4 text-base text-neutral-300 leading-relaxed">
-            Every 100 milliseconds of latency degrades user attention and triggers immediate mobile abandonment. See how replacing monolithic bloated CMS templates with edge-rendered Next.js directly increases revenue.
+
+          <p className={`text-sm max-w-md transition-colors ${
+            isDark ? 'text-neutral-400' : 'text-slate-600'
+          }`}>
+            Google research proves that pages taking over 3 seconds to load lose 40%+ of mobile buyers before the hero graphic even renders.
           </p>
         </div>
 
-        {/* Interactive Comparison & Calculator */}
-        <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        {/* Interactive Comparison & ROI Calculator (Expands Full Width) */}
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 2xl:gap-12 items-start">
           
-          {/* Controls & Impact Simulator (Left) */}
-          <div className="lg:col-span-6 rounded-2xl border border-neutral-800 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between">
+          {/* Left: Input Controls & Sliders (6 cols) */}
+          <div className={`lg:col-span-6 rounded-3xl border p-6 sm:p-10 space-y-8 transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/80 shadow-xl' : 'border-slate-200 bg-white shadow-md'
+          }`}>
+            <h3 className={`font-display text-xl font-bold transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Simulate Your Revenue Leak
+            </h3>
+
+            {/* Monthly Traffic Slider */}
             <div>
-              <h3 className="font-display text-xl font-bold text-white mb-6">
-                Interactive Pipeline Loss Simulator
-              </h3>
-
-              {/* Slider 1: Traffic */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-neutral-300 font-medium">Estimated Monthly Visitors</span>
-                  <span className="font-mono text-sm font-bold text-white tabular-nums">
-                    {monthlyVisitors.toLocaleString()} / mo
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="2000"
-                  max="100000"
-                  step="1000"
-                  value={monthlyVisitors}
-                  onChange={(e) => setMonthlyVisitors(Number(e.target.value))}
-                  className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#ff3b00]"
-                />
-                <div className="flex justify-between text-[11px] text-neutral-500 font-mono">
-                  <span>2,000</span>
-                  <span>50,000</span>
-                  <span>100,000+</span>
-                </div>
+              <div className="flex justify-between items-center mb-2">
+                <label className={`text-xs font-mono uppercase tracking-wider ${
+                  isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+                }`}>
+                  Monthly Unique Visitors
+                </label>
+                <span className="font-mono text-sm font-bold text-[#009fe3]">
+                  {monthlyVisitors.toLocaleString()} / mo
+                </span>
               </div>
-
-              {/* Slider 2: Average Contract/Order Value */}
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-neutral-300 font-medium">Average Deal / Customer Lifetime Value</span>
-                  <span className="font-mono text-sm font-bold text-white tabular-nums">
-                    ${dealValue.toLocaleString()} USD
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="500"
-                  max="25000"
-                  step="500"
-                  value={dealValue}
-                  onChange={(e) => setDealValue(Number(e.target.value))}
-                  className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#ff3b00]"
-                />
-                <div className="flex justify-between text-[11px] text-neutral-500 font-mono">
-                  <span>$500</span>
-                  <span>$10,000</span>
-                  <span>$25,000+</span>
-                </div>
-              </div>
-
-              {/* Calculated Results */}
-              <div className="rounded-xl border border-neutral-850 bg-neutral-900/60 p-5 space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                      Estimated Monthly Pipeline Opportunity
-                    </div>
-                    <div className="mt-1 font-display text-3xl sm:text-4xl font-bold text-emerald-400 tabular-nums">
-                      +${stats.estimatedLostRevenue.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                      Additional Inquiries
-                    </div>
-                    <div className="mt-1 font-display text-2xl font-bold text-white tabular-nums">
-                      +{stats.lostInquiries} <span className="text-xs text-neutral-400 font-mono">leads/mo</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-xs text-neutral-400 leading-relaxed border-t border-neutral-800 pt-3">
-                  Based on a conservative lift from 1.2% to 3.4% conversion through sub-second page delivery and simplified inquiry architecture.
-                </p>
-              </div>
+              <input
+                type="range"
+                min="5000"
+                max="250000"
+                step="5000"
+                value={monthlyVisitors}
+                onChange={(e) => setMonthlyVisitors(parseInt(e.target.value))}
+                className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-[#009fe3]"
+              />
             </div>
 
-            <div className="mt-8 pt-6 border-t border-neutral-850">
-              <button
-                type="button"
-                onClick={onOpenConsultation}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-white py-3.5 px-4 text-xs font-semibold text-neutral-950 transition-all hover:bg-neutral-200 active:scale-98"
-              >
-                <span>Recover Lost Pipeline With XwebA</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
+            {/* Average Order Value or Deal Size Slider */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className={`text-xs font-mono uppercase tracking-wider ${
+                  isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+                }`}>
+                  Average Order Value / Lead Value ($)
+                </label>
+                <span className="font-mono text-sm font-bold text-[#FF5E14]">
+                  ${avgOrderValue.toLocaleString()}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="20"
+                max="1000"
+                step="10"
+                value={avgOrderValue}
+                onChange={(e) => setAvgOrderValue(parseInt(e.target.value))}
+                className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-[#FF5E14]"
+              />
+            </div>
+
+            {/* Benchmark Comparison Cards */}
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-800">
+              <div className={`rounded-2xl border p-4 transition-colors ${
+                isDark ? 'border-rose-900/40 bg-rose-950/20' : 'border-rose-200 bg-rose-50/60'
+              }`}>
+                <div className="text-[11px] font-mono text-rose-500 uppercase font-semibold">Standard WP / Wix Site</div>
+                <div className="mt-1 font-mono text-xl font-bold text-rose-500">3.8s TTFB</div>
+                <div className="mt-1 text-[11px] text-neutral-400">42% average mobile abandonment</div>
+              </div>
+
+              <div className={`rounded-2xl border p-4 transition-colors ${
+                isDark ? 'border-cyan-900/40 bg-cyan-950/20' : 'border-cyan-200 bg-cyan-50/60'
+              }`}>
+                <div className="text-[11px] font-mono text-[#009fe3] uppercase font-semibold">XwebA Edge Platform</div>
+                <div className="mt-1 font-mono text-xl font-bold text-[#009fe3]">480ms TTFB</div>
+                <a
+                  href="https://www.hostinger.com?REFERRALCODE=1JOHN0542"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 text-[11px] text-neutral-400 hover:text-cyan-400 hover:underline flex items-center gap-1 transition-colors"
+                  title="Hostinger Partner Edge Infrastructure"
+                >
+                  <span>Hostinger Global Edge CDN</span>
+                  <span className="text-[10px] text-emerald-400 font-mono">20% off</span>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Architecture Comparison Cards (Right) */}
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            {/* Legacy Approach */}
-            <div className="rounded-2xl border border-rose-500/20 bg-neutral-950 p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 text-rose-400 text-xs font-mono">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span>Legacy WordPress / Builders</span>
-                </div>
-                <h4 className="mt-2 font-display text-lg font-bold text-white">
-                  Sluggish Digital Brochure
-                </h4>
-                
-                <div className="mt-6 space-y-4 text-xs text-neutral-400">
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Page Load Time</span>
-                    <strong className="text-base font-mono text-rose-400">4.2s – 6.8s</strong>
-                  </div>
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Mobile Bounce Rate</span>
-                    <strong className="text-base font-mono text-rose-400">54.2%</strong>
-                  </div>
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Lighthouse Performance</span>
-                    <strong className="text-base font-mono text-rose-400">32 / 100</strong>
-                  </div>
-                  <div>
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">AI Search Citability</span>
-                    <strong className="text-base font-mono text-rose-400">0% (Unstructured)</strong>
-                  </div>
-                </div>
+          {/* Right: Recoverable Pipeline Metric Readout (6 cols) */}
+          <div className={`lg:col-span-6 rounded-3xl border p-6 sm:p-10 flex flex-col justify-between transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/90 shadow-2xl' : 'border-slate-200 bg-white shadow-xl'
+          }`}>
+            <div>
+              <span className="text-xs font-mono uppercase tracking-wider text-[#FF5E14] font-semibold">
+                Annual Recaptured Pipeline Opportunity
+              </span>
+
+              <div className="mt-4 font-mono text-4xl sm:text-6xl font-bold text-white tracking-tight">
+                <span className="text-emerald-400">+${recoveredRevenueAnnual.toLocaleString()}</span>
+                <span className="text-xs font-normal text-neutral-400 block sm:inline sm:ml-2">/ year</span>
               </div>
 
-              <div className="mt-6 text-[11px] text-neutral-500 font-mono">
-                Over-reliant on bloated plugins, unoptimized databases, and slow shared hosting.
+              <p className={`mt-3 text-xs sm:text-sm leading-relaxed transition-colors ${
+                isDark ? 'text-neutral-300' : 'text-slate-600'
+              }`}>
+                By dropping your Time-to-First-Byte (TTFB) from 3.8s to sub-600ms, your business prevents <strong>{retainedTrafficMonthly.toLocaleString()} bounced mobile visitors</strong> every month.
+              </p>
+
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className={`rounded-xl p-4 border transition-colors ${
+                  isDark ? 'border-neutral-800 bg-neutral-900/50' : 'border-slate-200 bg-slate-50'
+                }`}>
+                  <div className="text-[11px] font-mono text-neutral-400">Monthly Recaptured Revenue</div>
+                  <div className="mt-1 font-mono text-2xl font-bold text-white">
+                    +${recoveredRevenueMonthly.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className={`rounded-xl p-4 border transition-colors ${
+                  isDark ? 'border-neutral-800 bg-neutral-900/50' : 'border-slate-200 bg-slate-50'
+                }`}>
+                  <div className="text-[11px] font-mono text-neutral-400">Recovered Conversions</div>
+                  <div className="mt-1 font-mono text-2xl font-bold text-[#009fe3]">
+                    +{recoveredSalesMonthly} customers
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* XwebA Engineered Approach */}
-            <div className="rounded-2xl border border-emerald-500/30 bg-neutral-950 p-6 flex flex-col justify-between ring-1 ring-emerald-500/20">
-              <div>
-                <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono">
-                  <Zap className="h-4 w-4" />
-                  <span>XwebA Edge Platform</span>
-                </div>
-                <h4 className="mt-2 font-display text-lg font-bold text-white">
-                  High-Conversion Engine
-                </h4>
-                
-                <div className="mt-6 space-y-4 text-xs text-neutral-300">
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Page Load Time</span>
-                    <strong className="text-base font-mono text-emerald-400">&lt; 0.5s</strong>
-                  </div>
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Mobile Bounce Rate</span>
-                    <strong className="text-base font-mono text-emerald-400">18.4%</strong>
-                  </div>
-                  <div className="border-b border-neutral-850 pb-3">
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">Lighthouse Performance</span>
-                    <strong className="text-base font-mono text-emerald-400">99 / 100</strong>
-                  </div>
-                  <div>
-                    <span className="block text-neutral-500 font-mono text-[10px] uppercase">AI Search Citability</span>
-                    <strong className="text-base font-mono text-emerald-400">96% (Native Triples)</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 text-[11px] text-neutral-400 font-mono">
-                Pure TypeScript, statically compiled assets, distributed edge caching, and zero bloat.
-              </div>
+            <div className="mt-8 pt-6 border-t border-neutral-800">
+              <button
+                onClick={onOpenConsultation}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3.5 text-xs font-semibold text-white shadow-lg transition-all hover:bg-[#e0520f]"
+              >
+                <span>Audit My Current Site Speed & Bounce Rate</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
             </div>
-
           </div>
 
         </div>

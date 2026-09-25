@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { StudioTeam } from './components/StudioTeam';
@@ -18,7 +19,8 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { CommandPalette } from './components/CommandPalette';
 import { ServiceItem } from './types';
 
-export default function App() {
+function AppContent() {
+  const { isDark } = useTheme();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [consultationPreload, setConsultationPreload] = useState<{
@@ -92,44 +94,48 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071520] text-[#ededed] font-sans selection:bg-[#FF5E14] selection:text-white">
-      {/* 3-Zone Top Bar Navigation with Hostinger Partner Banner */}
+    <div className={`min-h-screen w-full transition-colors duration-300 font-sans selection:bg-[#FF5E14] selection:text-white ${
+      isDark
+        ? 'bg-[#071520] text-[#ededed]'
+        : 'bg-[#f8fafc] text-[#0f172a]'
+    }`}>
+      {/* 3-Zone Top Bar Navigation with Hostinger Partner Banner & Theme Switcher */}
       <Navbar
         onOpenConsultation={() => handleOpenConsultation()}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
-      <main>
-        {/* Authentic Hero with Team Portrait & Brand Narrative */}
+      <main className="w-full">
+        {/* Authentic Hero with Team Portrait & Brand Narrative (Full Width) */}
         <Hero
           onOpenConsultation={() => handleOpenConsultation()}
           onScrollToEstimator={handleScrollToEstimator}
           onScrollToGeoAudit={handleScrollToGeoAudit}
         />
 
-        {/* Studio Culture & Craftsmanship: Strategy · Design · Growth */}
+        {/* Studio Culture & Craftsmanship: Strategy · Design · Growth (Full Width) */}
         <StudioTeam onOpenConsultation={() => handleOpenConsultation()} />
 
-        {/* Capabilities Deck with Interactive Detail Inspector */}
+        {/* Capabilities Deck with Interactive Detail Inspector (Full Width 4-Col) */}
         <ServicesBento onSelectService={handleSelectServiceFromBento} />
 
-        {/* Selected Work & Case Studies with Interactive Modal */}
+        {/* Selected Work & Case Studies with Interactive Modal (Full Width) */}
         <WorkShowcase onOpenConsultation={() => handleOpenConsultation()} />
 
-        {/* Interactive GEO & AI Citability Diagnostic Simulator */}
+        {/* Interactive GEO & AI Citability Diagnostic Simulator (Full Width) */}
         <GeoAuditor onRemediate={handleRemediateGeoDomain} />
 
-        {/* Interactive Scope & Investment Calculator */}
+        {/* Interactive Scope & Investment Calculator (Full Width) */}
         <ScopeCalculator onPreloadBrief={handlePreloadFromEstimator} />
 
-        {/* Interactive Speed & Pipeline Loss Simulator */}
+        {/* Interactive Speed & Pipeline Loss Simulator (Full Width) */}
         <PerformanceBenchmark onOpenConsultation={() => handleOpenConsultation()} />
 
-        {/* Clear 4-Week Delivery Methodology & FAQs */}
+        {/* Clear 4-Week Delivery Methodology & FAQs (Full Width) */}
         <ProcessTimeline />
       </main>
 
-      {/* Quiet, Unboxed Footer */}
+      {/* Quiet, Unboxed Footer (Full Width) */}
       <Footer onOpenConsultation={() => handleOpenConsultation()} />
 
       {/* Interactive Consultation / Discovery Brief Dialog */}
@@ -146,5 +152,13 @@ export default function App() {
         onOpenConsultation={() => handleOpenConsultation()}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }

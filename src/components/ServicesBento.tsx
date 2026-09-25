@@ -1,181 +1,209 @@
 import React, { useState } from 'react';
-import { SERVICES_DATA } from '../data/content';
-import { ArrowRight, Check, Code, Globe, Sparkles, TrendingUp, Cpu } from 'lucide-react';
+import { ArrowUpRight, CheckCircle2, ChevronRight, X, Sparkles, Cpu, Layers, TrendingUp } from 'lucide-react';
+import { SERVICES } from '../data/content';
 import { ServiceItem } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 interface ServicesBentoProps {
   onSelectService: (service: ServiceItem) => void;
 }
 
 export const ServicesBento: React.FC<ServicesBentoProps> = ({ onSelectService }) => {
-  const [activeServiceId, setActiveServiceId] = useState<string>(SERVICES_DATA[0].id);
-
-  const activeService = SERVICES_DATA.find((s) => s.id === activeServiceId) || SERVICES_DATA[0];
-
-  const getServiceIcon = (id: string) => {
-    switch (id) {
-      case 'web-engineering':
-        return <Code className="h-5 w-5 text-[#ff3b00]" />;
-      case 'geo-optimization':
-        return <Sparkles className="h-5 w-5 text-[#ff3b00]" />;
-      case 'brand-identity':
-        return <Globe className="h-5 w-5 text-[#ff3b00]" />;
-      case 'cro-funnels':
-        return <TrendingUp className="h-5 w-5 text-[#ff3b00]" />;
-      case 'ai-integrations':
-        return <Cpu className="h-5 w-5 text-[#ff3b00]" />;
-      default:
-        return <Code className="h-5 w-5 text-[#ff3b00]" />;
-    }
-  };
+  const [activeModalService, setActiveModalService] = useState<ServiceItem | null>(null);
+  const { isDark } = useTheme();
 
   return (
-    <section id="capabilities" className="relative py-20 lg:py-28 border-b border-neutral-800 bg-[#0c0d0e]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="capabilities" className={`relative w-full py-20 lg:py-28 border-b transition-colors ${
+      isDark ? 'border-neutral-800 bg-[#071520]' : 'border-slate-200 bg-[#f8fafc]'
+    }`}>
+      {/* Dynamic ambient color blend */}
+      <div className={`absolute top-1/4 right-10 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#009fe3]/10' : 'bg-[#009fe3]/06'
+      }`} />
+      <div className={`absolute bottom-10 left-10 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#FF5E14]/10' : 'bg-[#FF5E14]/06'
+      }`} />
+
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Header */}
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-            <span>Capabilities & Engineering Practice</span>
-            <span aria-hidden="true" className="text-neutral-600">·</span>
-            <span className="text-[#ff3b00]">Zero Template Policy</span>
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-12 transition-colors ${
+          isDark ? 'border-neutral-800' : 'border-slate-200'
+        }`}>
+          <div className="max-w-3xl">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#009fe3] font-semibold">
+              Capabilities Architecture
+            </span>
+            <h2 className={`mt-2 font-display text-3xl sm:text-5xl font-bold tracking-tight transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Engineered for conversion velocity, visual pedigree & AI citability.
+            </h2>
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Architecture built for speed, conversion, and machine intelligence.
-          </h2>
-          <p className="mt-4 text-base text-neutral-300 leading-relaxed">
-            We operate across five integrated practices to replace sluggish, generic templates with high-converting digital platforms engineered to dominate competitive search landscapes.
+
+          <p className={`text-sm max-w-md transition-colors ${
+            isDark ? 'text-neutral-400' : 'text-slate-600'
+          }`}>
+            Every deliverable adheres to our strict engineering standards: zero telemetry bloat, deterministic latency budgets, and structured semantic entity triples.
           </p>
         </div>
 
-        {/* Interactive Capability Deck */}
-        <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Service Selector List (Left) */}
-          <div className="lg:col-span-5 space-y-2">
-            {SERVICES_DATA.map((service) => {
-              const isActive = service.id === activeServiceId;
-              return (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => setActiveServiceId(service.id)}
-                  className={`w-full text-left p-5 rounded-xl border transition-all ${
-                    isActive
-                      ? 'border-white/20 bg-neutral-900 shadow-lg ring-1 ring-white/10'
-                      : 'border-neutral-850 bg-neutral-950/40 text-neutral-400 hover:border-neutral-700 hover:bg-neutral-900/30'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-neutral-500 font-semibold">
-                        {service.number}
-                      </span>
-                      <h3 className={`font-display text-base font-semibold transition-colors ${
-                        isActive ? 'text-white' : 'text-neutral-300'
+        {/* Full-width 4-column Bento Deck */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 2xl:gap-8">
+          {SERVICES.map((service, idx) => {
+            const isFeatured = idx === 0 || idx === 1;
+
+            return (
+              <div
+                key={service.id}
+                className={`group relative flex flex-col justify-between rounded-3xl border p-7 sm:p-8 transition-all duration-300 ${
+                  isDark
+                    ? 'border-neutral-800/90 bg-neutral-950/80 hover:border-cyan-500/50 hover:bg-neutral-900/60 shadow-xl'
+                    : 'border-slate-200 bg-white hover:border-[#009fe3] hover:shadow-xl'
+                }`}
+              >
+                <div>
+                  {/* Top metadata kicker */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs text-neutral-400">
+                      0{idx + 1}
+                    </span>
+
+                    {service.badge && (
+                      <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-semibold ${
+                        idx === 0
+                          ? 'bg-[#009fe3]/15 text-[#009fe3] border border-[#009fe3]/30'
+                          : 'bg-[#FF5E14]/15 text-[#FF5E14] border border-[#FF5E14]/30'
                       }`}>
-                        {service.title}
-                      </h3>
-                    </div>
-                    {isActive && <div className="h-1.5 w-1.5 rounded-full bg-[#ff3b00]" />}
+                        {service.badge}
+                      </span>
+                    )}
                   </div>
-                  <p className="mt-2 text-xs text-neutral-400 line-clamp-2 leading-relaxed pl-7">
-                    {service.tagline}
+
+                  {/* Title & Description */}
+                  <h3 className={`mt-5 font-display text-xl font-bold tracking-tight transition-colors ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    {service.title}
+                  </h3>
+
+                  <p className={`mt-3 text-xs sm:text-sm leading-relaxed transition-colors ${
+                    isDark ? 'text-neutral-300' : 'text-slate-600'
+                  }`}>
+                    {service.shortDesc}
                   </p>
-                </button>
-              );
-            })}
-          </div>
 
-          {/* Detailed Inspector Frame (Right) */}
-          <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 sm:p-10 shadow-2xl">
-              
-              {/* Header inside card */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-850 pb-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900">
-                    {getServiceIcon(activeService.id)}
-                  </div>
-                  <div>
-                    <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                      Capability {activeService.number}
-                    </span>
-                    <h3 className="font-display text-xl sm:text-2xl font-bold text-white">
-                      {activeService.title}
-                    </h3>
-                  </div>
+                  {/* Feature Checklist */}
+                  <ul className={`mt-6 space-y-2 text-xs border-t pt-5 transition-colors ${
+                    isDark ? 'border-neutral-850 text-neutral-300' : 'border-slate-100 text-slate-700'
+                  }`}>
+                    {service.features.slice(0, 3).map((feat, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[#009fe3] shrink-0 mt-0.5" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <div className="text-left sm:text-right">
-                  <div className="font-display text-2xl font-bold text-[#ff3b00] tabular-nums">
-                    {activeService.metricHighlight}
-                  </div>
-                  <div className="text-[11px] text-neutral-400 font-mono">
-                    {activeService.metricLabel}
-                  </div>
-                </div>
-              </div>
+                {/* Bottom Actions */}
+                <div className={`mt-8 pt-5 border-t flex items-center justify-between gap-3 ${
+                  isDark ? 'border-neutral-850' : 'border-slate-100'
+                }`}>
+                  <button
+                    onClick={() => setActiveModalService(service)}
+                    className={`text-xs font-mono transition-colors flex items-center gap-1 ${
+                      isDark ? 'text-neutral-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>Inspect Specs</span>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
 
-              {/* Description */}
-              <div className="mt-6 text-sm text-neutral-300 leading-relaxed font-normal">
-                {activeService.description}
-              </div>
-
-              {/* Deliverables List */}
-              <div className="mt-8">
-                <div className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-                  Core Engineering Deliverables
-                </div>
-                <div className="space-y-2.5">
-                  {activeService.deliverables.map((del, idx) => (
-                    <div key={idx} className="flex items-start gap-3 text-xs text-neutral-200">
-                      <Check className="h-4 w-4 text-[#ff3b00] shrink-0 mt-0.5" />
-                      <span>{del}</span>
-                    </div>
-                  ))}
+                  <button
+                    onClick={() => onSelectService(service)}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF5E14] text-white shadow-sm transition-all hover:bg-[#e0520f] active:scale-95"
+                    aria-label={`Initiate ${service.title}`}
+                  >
+                    <ArrowUpRight className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-
-              {/* Technology Stack Tags (clean unboxed text or minimal tags) */}
-              <div className="mt-8 border-t border-neutral-850 pt-6">
-                <div className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-                  Associated Stack & Protocols
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {activeService.technologies.map((tech, idx) => (
-                    <span
-                      key={idx}
-                      className="rounded-md border border-neutral-800 bg-neutral-900/70 px-2.5 py-1 text-xs font-mono text-neutral-300"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-8 pt-6 border-t border-neutral-850 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => onSelectService(activeService)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-xs font-semibold text-neutral-950 transition-all hover:bg-neutral-200 active:scale-98"
-                >
-                  <span>Inquire About {activeService.title}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-
-                <span className="text-xs text-neutral-500 font-mono hidden sm:inline">
-                  Sprint timeline: ~3–5 weeks
-                </span>
-              </div>
-
-            </div>
-          </div>
-
+            );
+          })}
         </div>
 
       </div>
+
+      {/* Detail Inspector Modal */}
+      {activeModalService && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className={`relative w-full max-w-2xl rounded-3xl border p-6 sm:p-10 shadow-2xl transition-colors ${
+            isDark ? 'border-neutral-800 bg-[#071520] text-neutral-200' : 'border-slate-200 bg-white text-slate-800'
+          }`}>
+            <button
+              onClick={() => setActiveModalService(null)}
+              className={`absolute top-6 right-6 p-2 rounded-lg transition-colors ${
+                isDark ? 'text-neutral-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+              }`}
+              aria-label="Close details"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <span className="text-xs font-mono uppercase tracking-wider text-[#009fe3] font-semibold">
+              Capability Specification
+            </span>
+            <h3 className={`mt-2 font-display text-2xl sm:text-3xl font-bold transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              {activeModalService.title}
+            </h3>
+            
+            <p className={`mt-4 text-sm leading-relaxed transition-colors ${
+              isDark ? 'text-neutral-300' : 'text-slate-600'
+            }`}>
+              {activeModalService.fullDesc || activeModalService.description}
+            </p>
+
+            <div className="mt-6">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-[#FF5E14] mb-3 font-semibold">
+                Included Deliverables & Guarantees
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                {(activeModalService.features || activeModalService.deliverables || []).map((feat: string, i: number) => (
+                  <div key={i} className={`flex items-start gap-2 rounded-xl p-3 border transition-colors ${
+                    isDark ? 'border-neutral-800 bg-neutral-950/70 text-neutral-300' : 'border-slate-200 bg-slate-50 text-slate-700'
+                  }`}>
+                    <CheckCircle2 className="h-4 w-4 text-[#009fe3] shrink-0 mt-0.5" />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`mt-8 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${
+              isDark ? 'border-neutral-800' : 'border-slate-200'
+            }`}>
+              <div className="text-xs font-mono text-neutral-400">
+                Turnaround: 3–5 Weeks · Zero Lock-In Codebase
+              </div>
+
+              <button
+                onClick={() => {
+                  const service = activeModalService;
+                  setActiveModalService(null);
+                  onSelectService(service);
+                }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] px-6 py-3 text-xs font-semibold text-white hover:bg-[#e0520f] transition-all"
+              >
+                <span>Select for Discovery Brief</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

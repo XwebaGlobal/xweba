@@ -1,50 +1,67 @@
 import React from 'react';
+import logo1Img from '../assets/images/Logo-1.png';
+import logo2Img from '../assets/images/Logo-2.png';
+import { useTheme } from '../context/ThemeContext';
 
 interface XwebaLogoProps {
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'auto' | 'white' | 'dark' | 'monochrome-white';
   showTagline?: boolean;
   className?: string;
 }
 
 export const XwebaLogo: React.FC<XwebaLogoProps> = ({
   size = 'md',
+  variant = 'auto',
   showTagline = true,
   className = ''
 }) => {
-  const textSize = size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-3xl' : 'text-2xl';
-  const taglineSize = size === 'sm' ? 'text-[8px]' : size === 'lg' ? 'text-[11px]' : 'text-[9px]';
+  const { isDark } = useTheme();
+
+  // Dimensions proportional to 1600x514 (~3.11 : 1 ratio)
+  const heightClass = size === 'sm' ? 'h-6 sm:h-7' : size === 'lg' ? 'h-10 sm:h-12' : 'h-8 sm:h-9';
+
+  // Determine whether to show the white logo:
+  // - In dark mode, or when explicitly requested variant='white' or 'monochrome-white', use the white logo
+  // - In light mode, use the dark navy logo (Logo-2)
+  const isWhiteLogo = variant === 'white' || variant === 'monochrome-white' || (variant === 'auto' && isDark);
+
+  const logoSrc = isWhiteLogo ? logo1Img : logo2Img;
+  const isMonochrome = variant === 'monochrome-white';
 
   return (
-    <div className={`inline-flex flex-col leading-none select-none ${className}`}>
-      <div className={`font-display font-extrabold tracking-tight ${textSize} flex items-baseline`}>
-        {/* 'xwe' in signature electric cyan */}
-        <span className="text-[#009fe3]">xwe</span>
-        
-        {/* '/oA' / 'bA' in signature energetic orange */}
-        <span className="text-[#FF5E14] inline-flex items-center ml-0.5">
-          <span className="font-light mx-0.5 transform -skew-x-12 opacity-80">/</span>
-          <span className="tracking-tighter">oA</span>
-        </span>
-      </div>
-
-      {showTagline && (
-        <span
-          className={`font-mono uppercase tracking-widest text-neutral-400 mt-0.5 ${taglineSize} block`}
-        >
-          digital growth partner
-        </span>
-      )}
+    <div
+      className={`inline-flex items-center transition-all duration-300 hover:opacity-95 ${className}`}
+      title="XwebA - digital growth partner"
+    >
+      <img
+        src={logoSrc}
+        alt="XwebA - digital growth partner"
+        className={`${heightClass} w-auto object-contain select-none transition-all duration-300 ${
+          isMonochrome ? 'brightness-0 invert' : ''
+        }`}
+        loading="eager"
+      />
     </div>
   );
 };
 
-export const HostingerBadge: React.FC<{ className?: string; compact?: boolean }> = ({
+export const HostingerBadge: React.FC<{
+  className?: string;
+  compact?: boolean;
+  href?: string;
+}> = ({
   className = '',
-  compact = false
+  compact = false,
+  href = 'https://www.hostinger.com?REFERRALCODE=1JOHN0542'
 }) => {
   return (
-    <div
-      className={`inline-flex items-center gap-2 rounded-lg bg-[#673de6] text-white shadow-sm font-sans transition-transform hover:scale-102 ${
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Hostinger Official Partner - Get 20% Off Cloud Edge Hosting"
+      className={`inline-flex items-center gap-2 rounded-lg bg-[#673de6] text-white shadow-sm font-sans transition-all hover:bg-[#5832c7] hover:scale-102 hover:shadow-md active:scale-98 cursor-pointer select-none ${
         compact ? 'px-2.5 py-1 text-[11px]' : 'px-3 py-1.5 text-xs'
       } ${className}`}
     >
@@ -62,6 +79,6 @@ export const HostingerBadge: React.FC<{ className?: string; compact?: boolean }>
         <span className="uppercase tracking-wider">Hostinger</span>
         <span className="font-normal opacity-90 text-[10px] tracking-normal">Partner</span>
       </div>
-    </div>
+    </a>
   );
 };

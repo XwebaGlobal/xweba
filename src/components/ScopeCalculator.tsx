@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { Calculator, Check, ArrowRight, Sparkles, Clock, Layers, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calculator, ArrowRight, ShieldCheck, Check, Sparkles, Layers } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface ScopeCalculatorProps {
-  onPreloadBrief: (briefData: {
+  onPreloadBrief: (data: {
     serviceName: string;
     estimatedCost: string;
     timeline: string;
@@ -10,263 +11,215 @@ interface ScopeCalculatorProps {
   }) => void;
 }
 
-interface CoreOption {
-  id: string;
-  name: string;
-  basePrice: number;
-  baseWeeks: number;
-  description: string;
-  deliverables: string[];
-}
-
-const CORE_OPTIONS: CoreOption[] = [
-  {
-    id: 'web-platform',
-    name: 'High-Performance Web Platform',
-    basePrice: 3800,
-    baseWeeks: 4,
-    description: 'Custom edge-rendered React / Next.js architecture with bespoke UI and mobile performance engineering.',
-    deliverables: ['Custom component library', 'Sub-800ms TTFB optimization', 'Responsive layout system', 'Core Web Vitals certification']
-  },
-  {
-    id: 'geo-growth',
-    name: 'Generative Engine Optimization (GEO)',
-    basePrice: 2400,
-    baseWeeks: 3,
-    description: 'Semantic entity graph structuring and AI citability layer for ChatGPT, Perplexity, Gemini, and Google.',
-    deliverables: ['JSON-LD entity triples', 'Information Gain content audit', 'AI answer engine indexation', 'Monthly citation tracking']
-  },
-  {
-    id: 'brand-system',
-    name: 'Visual Identity & Design System',
-    basePrice: 2800,
-    baseWeeks: 3,
-    description: 'Comprehensive brand identity, typography rules, color science, and scalable Figma component architecture.',
-    deliverables: ['Bespoke logomark & logotype', 'Typographic hierarchy specs', 'Figma production tokens', 'Design guidelines document']
-  },
-  {
-    id: 'flagship-bundle',
-    name: 'Full Digital Flagship (Platform + GEO + Brand)',
-    basePrice: 7600,
-    baseWeeks: 6,
-    description: 'The complete end-to-end digital transformation. Brand identity, bespoke web engineering, and deep GEO layer.',
-    deliverables: ['Complete brand visual identity', 'Headless Next.js platform', 'Deep GEO & entity graph', 'Conversion funnel engineering']
-  }
-];
-
-interface AddonOption {
-  id: string;
-  name: string;
-  price: number;
-  extraWeeks: number;
-  description: string;
-}
-
-const ADDONS: AddonOption[] = [
-  {
-    id: 'headless-cms',
-    name: 'Headless CMS Integration',
-    price: 950,
-    extraWeeks: 1,
-    description: 'Empower your marketing team to edit content seamlessly with Sanity or Strapi.'
-  },
-  {
-    id: 'ai-rag-tool',
-    name: 'Embedded AI Assistant / Vector Tool',
-    price: 1600,
-    extraWeeks: 1,
-    description: 'Domain-specific semantic search or interactive AI assistant for site visitors.'
-  },
-  {
-    id: 'interactive-funnel',
-    name: 'Interactive Calculators & Lead Funnels',
-    price: 850,
-    extraWeeks: 0.5,
-    description: 'Custom calculators, quote estimators, and multi-step inquiry forms.'
-  },
-  {
-    id: 'multilingual',
-    name: 'Multilingual Localization Layer',
-    price: 750,
-    extraWeeks: 0.5,
-    description: 'Full internationalization (i18n) setup for regional or global audiences.'
-  }
-];
-
 export const ScopeCalculator: React.FC<ScopeCalculatorProps> = ({ onPreloadBrief }) => {
-  const [selectedCoreId, setSelectedCoreId] = useState<string>('web-platform');
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(['headless-cms']);
-  const [velocity, setVelocity] = useState<'standard' | 'accelerated'>('standard');
-  const [tier, setTier] = useState<'startup' | 'growth' | 'enterprise'>('growth');
+  const [projectType, setProjectType] = useState<'marketing' | 'ecommerce' | 'saas' | 'ai-geo'>('marketing');
+  const [pageCount, setPageCount] = useState<number>(5);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([
+    'geo-optimization',
+    'edge-performance'
+  ]);
+  const { isDark } = useTheme();
 
-  const selectedCore = CORE_OPTIONS.find((c) => c.id === selectedCoreId) || CORE_OPTIONS[0];
+  const projectTypes = [
+    { id: 'marketing', name: 'High-Converting Web Architecture', basePrice: 2800, baseWeeks: 3 },
+    { id: 'ecommerce', name: 'Luxury / High-SKU E-Commerce', basePrice: 4800, baseWeeks: 5 },
+    { id: 'saas', name: 'SaaS / AI Web Application UI', basePrice: 5600, baseWeeks: 6 },
+    { id: 'ai-geo', name: 'GEO & Entity Citability Engine', basePrice: 2400, baseWeeks: 3 }
+  ];
 
-  const toggleAddon = (addonId: string) => {
+  const addonsList = [
+    { id: 'geo-optimization', name: 'Generative Engine Optimization (GEO)', cost: 1200, weeks: 1 },
+    { id: 'edge-performance', name: 'Hostinger Edge CDN & Sub-800ms TTFB', cost: 600, weeks: 0 },
+    { id: 'cms-integration', name: 'Headless CMS & Custom Workflows', cost: 1400, weeks: 1 },
+    { id: 'brand-identity', name: 'Tactile Brand Identity & Design Tokens', cost: 1800, weeks: 1 },
+    { id: 'analytics-cro', name: 'Conversion Rate Tracking & Heatmaps', cost: 800, weeks: 0 }
+  ];
+
+  const toggleAddon = (id: string) => {
     setSelectedAddons((prev) =>
-      prev.includes(addonId) ? prev.filter((id) => id !== addonId) : [...prev, addonId]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  const calculatedTotals = useMemo(() => {
-    let base = selectedCore.basePrice;
-    let weeks = selectedCore.baseWeeks;
+  const currentProject = projectTypes.find((p) => p.id === projectType) || projectTypes[0];
 
-    // Addons
-    selectedAddons.forEach((id) => {
-      const addon = ADDONS.find((a) => a.id === id);
-      if (addon) {
-        base += addon.price;
-        weeks += addon.extraWeeks;
-      }
-    });
+  // Pricing calculations
+  const perPageFee = projectType === 'ecommerce' ? 180 : 120;
+  const pagesCost = (pageCount - 1) * perPageFee;
+  const addonsCost = selectedAddons.reduce((sum, id) => {
+    const addon = addonsList.find((a) => a.id === id);
+    return sum + (addon ? addon.cost : 0);
+  }, 0);
 
-    // Tier factor
-    const tierMultiplier = tier === 'startup' ? 0.85 : tier === 'growth' ? 1.0 : 1.35;
-    base = Math.round(base * tierMultiplier);
+  const totalCost = currentProject.basePrice + pagesCost + addonsCost;
+  const totalWeeks =
+    currentProject.baseWeeks +
+    (pageCount > 10 ? 1 : 0) +
+    selectedAddons.reduce((sum, id) => {
+      const addon = addonsList.find((a) => a.id === id);
+      return sum + (addon ? addon.weeks : 0);
+    }, 0);
 
-    // Velocity factor
-    if (velocity === 'accelerated') {
-      base = Math.round(base * 1.25);
-      weeks = Math.max(2, Math.round(weeks * 0.65));
-    }
-
-    return {
-      priceEstimate: `$${base.toLocaleString()}`,
-      weeks: `${Math.round(weeks)} weeks`,
-      rawPrice: base
-    };
-  }, [selectedCore, selectedAddons, tier, velocity]);
-
-  const handleApplyScope = () => {
-    const addonNames = selectedAddons.map((id) => ADDONS.find((a) => a.id === id)?.name || id);
+  const handleTransferToConsultation = () => {
     onPreloadBrief({
-      serviceName: `${selectedCore.name} (${tier.toUpperCase()})`,
-      estimatedCost: calculatedTotals.priceEstimate,
-      timeline: calculatedTotals.weeks,
-      modules: addonNames
+      serviceName: `${currentProject.name} (${pageCount} Views)`,
+      estimatedCost: `$${totalCost.toLocaleString()}`,
+      timeline: `${totalWeeks} weeks`,
+      modules: selectedAddons.map((id) => addonsList.find((a) => a.id === id)?.name || id)
     });
   };
 
   return (
-    <section id="scope-calculator" className="relative py-20 lg:py-28 border-b border-neutral-800 bg-[#0c0d0e]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="scope-calculator" className={`relative w-full py-20 lg:py-28 border-b transition-colors ${
+      isDark ? 'border-neutral-800 bg-[#071520]' : 'border-slate-200 bg-white'
+    }`}>
+      {/* Ambient color blend */}
+      <div className={`absolute top-1/3 left-1/3 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#FF5E14]/10' : 'bg-[#FF5E14]/06'
+      }`} />
+      <div className={`absolute bottom-0 right-10 -z-10 h-80 w-80 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#009fe3]/10' : 'bg-[#009fe3]/06'
+      }`} />
+
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Header */}
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-            <span>Transparent Pricing Engine</span>
-            <span aria-hidden="true" className="text-neutral-600">·</span>
-            <span className="text-[#ff3b00]">Zero Hidden Markups</span>
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-12 transition-colors ${
+          isDark ? 'border-neutral-800' : 'border-slate-200'
+        }`}>
+          <div className="max-w-3xl">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#FF5E14] font-semibold">
+              Transparent Pricing & Scope Estimator
+            </span>
+            <h2 className={`mt-2 font-display text-3xl sm:text-5xl font-bold tracking-tight transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Calculate your architecture investment in real time.
+            </h2>
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Interactive Project Scope & Investment Estimator.
-          </h2>
-          <p className="mt-4 text-base text-neutral-300 leading-relaxed">
-            Eliminate agency guesswork. Configure your required technical architecture, select your operational stage, and receive an instant, realistic turnaround and investment baseline.
+
+          <p className={`text-sm max-w-md transition-colors ${
+            isDark ? 'text-neutral-400' : 'text-slate-600'
+          }`}>
+            We believe in upfront, deterministic budgets. No hidden scope creep, no opaque change requests. Everything is scoped before the first line of code is written.
           </p>
         </div>
 
-        {/* Interactive Workspace */}
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Interactive Calculator Shell (Expands Full Width) */}
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 2xl:gap-12 items-start">
           
-          {/* Controls Column (Left) */}
-          <div className="lg:col-span-7 space-y-8">
+          {/* Left Column: Scope Inputs (8 cols) */}
+          <div className={`lg:col-span-8 rounded-3xl border p-6 sm:p-10 space-y-8 transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/80 shadow-xl' : 'border-slate-200 bg-slate-50/70 shadow-md'
+          }`}>
             
-            {/* Step 1: Select Core Objective */}
+            {/* 1. Project Type Selector */}
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-3">
-                01. Core Architecture Focus
+              <label className={`block text-xs font-mono uppercase tracking-wider mb-4 ${
+                isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+              }`}>
+                Step 1: Select Primary Core System
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {CORE_OPTIONS.map((opt) => {
-                  const isSelected = selectedCoreId === opt.id;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setSelectedCoreId(opt.id)}
-                      className={`text-left p-4 rounded-xl border transition-all ${
-                        isSelected
-                          ? 'border-[#ff3b00] bg-neutral-900/90 shadow-md ring-1 ring-[#ff3b00]'
-                          : 'border-neutral-800 bg-neutral-950/60 hover:border-neutral-700 hover:bg-neutral-900/40'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-display font-semibold text-sm text-white">
-                          {opt.name}
-                        </span>
-                        {isSelected && (
-                          <span className="h-2 w-2 rounded-full bg-[#ff3b00]" />
-                        )}
-                      </div>
-                      <p className="mt-2 text-xs text-neutral-400 leading-relaxed">
-                        {opt.description}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
-            {/* Step 2: Operational Stage / Scope */}
-            <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-3">
-                02. Organization Scale
-              </label>
-              <div className="flex items-center gap-2 p-1.5 rounded-xl border border-neutral-800 bg-neutral-950">
-                {(['startup', 'growth', 'enterprise'] as const).map((t) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {projectTypes.map((type) => (
                   <button
-                    key={t}
+                    key={type.id}
                     type="button"
-                    onClick={() => setTier(t)}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg capitalize transition-colors ${
-                      tier === t
-                        ? 'bg-neutral-800 text-white shadow-sm'
-                        : 'text-neutral-400 hover:text-neutral-200'
+                    onClick={() => setProjectType(type.id as any)}
+                    className={`rounded-2xl border p-4 text-left transition-all ${
+                      projectType === type.id
+                        ? isDark
+                          ? 'border-[#009fe3] bg-[#0c2438] text-white shadow-sm ring-1 ring-[#009fe3]'
+                          : 'border-[#009fe3] bg-cyan-50/70 text-slate-900 shadow-sm ring-1 ring-[#009fe3]'
+                        : isDark
+                          ? 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:border-neutral-700 hover:text-white'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
                     }`}
                   >
-                    {t === 'startup' ? 'Startup / Seed' : t === 'growth' ? 'Growth / Series A-B' : 'Enterprise / Scale'}
+                    <div className="font-display font-bold text-sm">{type.name}</div>
+                    <div className="mt-2 flex items-center justify-between text-xs font-mono">
+                      <span className={projectType === type.id ? 'text-[#009fe3] font-semibold' : 'text-neutral-400'}>
+                        From ${type.basePrice.toLocaleString()}
+                      </span>
+                      <span className="text-neutral-400">
+                        {type.baseWeeks} Weeks
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Step 3: Optional Capabilities & Modules */}
+            {/* 2. Page & View Density Slider */}
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-3">
-                03. Add-on Capabilities & Integrations
+              <div className="flex items-center justify-between mb-3">
+                <label className={`text-xs font-mono uppercase tracking-wider ${
+                  isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+                }`}>
+                  Step 2: Number of Bespoke Views / Funnel Pages
+                </label>
+                <span className="font-mono text-sm font-bold text-[#FF5E14]">
+                  {pageCount} Views
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="1"
+                max="25"
+                step="1"
+                value={pageCount}
+                onChange={(e) => setPageCount(parseInt(e.target.value))}
+                className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-[#FF5E14]"
+              />
+
+              <div className="mt-2 flex justify-between text-[11px] font-mono text-neutral-400">
+                <span>1 (Minimalist Landing)</span>
+                <span>10 (Full Enterprise)</span>
+                <span>25+ (Multi-Region / Portal)</span>
+              </div>
+            </div>
+
+            {/* 3. Capability Modules & Addons */}
+            <div>
+              <label className={`block text-xs font-mono uppercase tracking-wider mb-4 ${
+                isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+              }`}>
+                Step 3: Engineering Addons & AI Enhancements
               </label>
-              <div className="space-y-2">
-                {ADDONS.map((addon) => {
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {addonsList.map((addon) => {
                   const isChecked = selectedAddons.includes(addon.id);
                   return (
                     <button
                       key={addon.id}
                       type="button"
                       onClick={() => toggleAddon(addon.id)}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left transition-all ${
+                      className={`flex items-start justify-between rounded-xl border p-3.5 text-left transition-all ${
                         isChecked
-                          ? 'border-neutral-600 bg-neutral-900/80 text-white'
-                          : 'border-neutral-850 bg-neutral-950/40 text-neutral-400 hover:border-neutral-700'
+                          ? isDark
+                            ? 'border-neutral-700 bg-neutral-900 text-white'
+                            : 'border-cyan-300 bg-cyan-50/50 text-slate-900 shadow-xs'
+                          : isDark
+                            ? 'border-neutral-850 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
-                            isChecked
-                              ? 'border-[#ff3b00] bg-[#ff3b00] text-white'
-                              : 'border-neutral-700 bg-neutral-900'
-                          }`}
-                        >
-                          {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
-                        </div>
-                        <div>
-                          <div className="text-xs font-medium text-white">{addon.name}</div>
-                          <div className="text-[11px] text-neutral-400">{addon.description}</div>
+                      <div className="pr-2">
+                        <div className="text-xs font-semibold">{addon.name}</div>
+                        <div className="text-[11px] font-mono text-[#009fe3] mt-1">
+                          +${addon.cost.toLocaleString()}
                         </div>
                       </div>
-                      <div className="font-mono text-xs text-neutral-300 tabular-nums">
-                        +${addon.price}
+
+                      <div
+                        className={`h-5 w-5 shrink-0 rounded flex items-center justify-center transition-colors ${
+                          isChecked ? 'bg-[#FF5E14] text-white' : isDark ? 'border border-neutral-700 bg-neutral-800' : 'border border-slate-300 bg-slate-100'
+                        }`}
+                      >
+                        {isChecked && <Check className="h-3.5 w-3.5" />}
                       </div>
                     </button>
                   );
@@ -274,114 +227,81 @@ export const ScopeCalculator: React.FC<ScopeCalculatorProps> = ({ onPreloadBrief
               </div>
             </div>
 
-            {/* Step 4: Sprint Velocity */}
+          </div>
+
+          {/* Right Column: Dynamic Price & Timeline Summary (4 cols) */}
+          <div className={`lg:col-span-4 rounded-3xl border p-6 sm:p-8 flex flex-col justify-between sticky top-24 transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/90 shadow-2xl' : 'border-slate-200 bg-white shadow-xl'
+          }`}>
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 block mb-3">
-                04. Delivery Velocity
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setVelocity('standard')}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
-                    velocity === 'standard'
-                      ? 'border-white/30 bg-neutral-900 text-white'
-                      : 'border-neutral-800 bg-neutral-950/50 text-neutral-400 hover:border-neutral-700'
-                  }`}
-                >
-                  <div className="text-xs font-semibold text-white">Standard Cadence</div>
-                  <div className="mt-1 text-[11px] text-neutral-400">Consistent weekly sprints and async reviews.</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setVelocity('accelerated')}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
-                    velocity === 'accelerated'
-                      ? 'border-[#ff3b00] bg-neutral-900 text-white'
-                      : 'border-neutral-800 bg-neutral-950/50 text-neutral-400 hover:border-neutral-700'
-                  }`}
-                >
-                  <div className="text-xs font-semibold text-white flex items-center justify-between">
-                    <span>Priority Sprint (+25%)</span>
-                    <Sparkles className="h-3 w-3 text-[#ff3b00]" />
-                  </div>
-                  <div className="mt-1 text-[11px] text-neutral-400">Dedicated multi-engineer squad with fast-tracked launch.</div>
-                </button>
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+                Scope Summary
+              </span>
+
+              <h3 className={`mt-2 font-display text-2xl font-bold transition-colors ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>
+                Estimated Investment
+              </h3>
+
+              {/* Big Price Tag */}
+              <div className="mt-6 border-b pb-6 border-neutral-800">
+                <div className="text-xs font-mono text-neutral-400">Turnkey Fixed Budget:</div>
+                <div className="mt-1 font-mono text-4xl sm:text-5xl font-bold text-white flex items-baseline gap-1">
+                  <span className="text-[#FF5E14]">${totalCost.toLocaleString()}</span>
+                  <span className="text-xs text-neutral-400 font-normal">USD</span>
+                </div>
+                <div className="mt-2 text-xs font-mono text-[#009fe3]">
+                  Sprint Duration: ~{totalWeeks} Weeks to Launch
+                </div>
+              </div>
+
+              {/* Itemized breakdown */}
+              <div className={`mt-6 space-y-2.5 text-xs transition-colors ${
+                isDark ? 'text-neutral-300' : 'text-slate-600'
+              }`}>
+                <div className="flex justify-between">
+                  <span>Base Architecture:</span>
+                  <span className="font-mono">${currentProject.basePrice.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{pageCount} Views Layout:</span>
+                  <span className="font-mono">${pagesCost.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Active Addons ({selectedAddons.length}):</span>
+                  <span className="font-mono">${addonsCost.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-neutral-800 text-emerald-400 font-semibold">
+                  <a
+                    href="https://www.hostinger.com?REFERRALCODE=1JOHN0542"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center gap-1 transition-colors"
+                    title="Hostinger Cloud Setup - Referral Discount"
+                  >
+                    <span>Hostinger Cloud Setup:</span>
+                    <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400">Partner</span>
+                  </a>
+                  <span>INCLUDED ($0)</span>
+                </div>
+              </div>
+
+              <div className={`mt-6 rounded-xl border p-3 text-[11px] leading-relaxed transition-colors ${
+                isDark ? 'border-neutral-800 bg-neutral-900/60 text-neutral-400' : 'border-slate-200 bg-slate-50 text-slate-600'
+              }`}>
+                Includes complete code ownership, full intellectual property transfer, and a 30-day post-launch warranty period.
               </div>
             </div>
 
-          </div>
-
-          {/* Real-time Summary Card (Right) */}
-          <div className="lg:col-span-5 sticky top-24">
-            <div className="rounded-2xl border border-neutral-700 bg-neutral-900/90 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-              
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
-                <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                  Estimated Scope Investment
-                </span>
-                <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-mono">
-                  <Shield className="h-3.5 w-3.5" /> Fixed-price guarantee
-                </span>
-              </div>
-
-              {/* Dynamic Price Display */}
-              <div className="py-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white tabular-nums">
-                    {calculatedTotals.priceEstimate}
-                  </span>
-                  <span className="text-xs text-neutral-400 font-mono">USD</span>
-                </div>
-                <div className="mt-2 flex items-center gap-4 text-xs text-neutral-300">
-                  <span className="flex items-center gap-1 font-mono">
-                    <Clock className="h-3.5 w-3.5 text-neutral-400" />
-                    Target Timeline: <strong className="text-white ml-1">{calculatedTotals.weeks}</strong>
-                  </span>
-                  <span aria-hidden="true" className="text-neutral-700">·</span>
-                  <span className="text-neutral-400">Staged milestone billing</span>
-                </div>
-              </div>
-
-              {/* Included Deliverables preview */}
-              <div className="border-t border-neutral-800 pt-5 space-y-3">
-                <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                  Confirmed Deliverables
-                </div>
-                <ul className="space-y-2 text-xs text-neutral-300">
-                  {selectedCore.deliverables.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#ff3b00] shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                  {selectedAddons.map((id) => {
-                    const addon = ADDONS.find((a) => a.id === id);
-                    return addon ? (
-                      <li key={id} className="flex items-start gap-2 text-white">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{addon.name}</span>
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-8 pt-4 border-t border-neutral-800">
-                <button
-                  type="button"
-                  onClick={handleApplyScope}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ff3b00] py-3.5 px-4 text-sm font-semibold text-white shadow-lg transition-all hover:bg-[#e03400] active:scale-98"
-                >
-                  <span>Lock in Scope & Book Strategy Brief</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-                <p className="mt-2.5 text-center text-[11px] text-neutral-400">
-                  Non-binding estimate. Refined during our direct 30-min discovery session.
-                </p>
-              </div>
-
+            <div className="mt-8 pt-4">
+              <button
+                onClick={handleTransferToConsultation}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3.5 text-xs font-semibold text-white shadow-lg transition-all hover:bg-[#e0520f] active:scale-98"
+              >
+                <span>Lock in Estimate & Book Call</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
 

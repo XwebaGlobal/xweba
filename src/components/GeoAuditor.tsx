@@ -1,331 +1,292 @@
 import React, { useState } from 'react';
-import { Sparkles, Bot, Search, AlertCircle, CheckCircle2, ArrowRight, RefreshCw, Layers } from 'lucide-react';
-import { GeoAuditResult } from '../types';
+import { Search, Bot, AlertTriangle, CheckCircle, ArrowRight, Sparkles, RefreshCw, Layers } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface GeoAuditorProps {
   onRemediate: (domain: string) => void;
 }
 
-const PRESET_DOMAINS = [
-  { domain: 'apex-logistics.io', label: 'B2B Logistics' },
-  { domain: 'savanna-fintech.co', label: 'Fintech Platform' },
-  { domain: 'lumina-studios.design', label: 'Creative Studio' },
-  { domain: 'biocore-health.com', label: 'HealthTech' }
-];
-
 export const GeoAuditor: React.FC<GeoAuditorProps> = ({ onRemediate }) => {
-  const [domainInput, setDomainInput] = useState('savanna-fintech.co');
+  const [domain, setDomain] = useState('');
   const [isAuditing, setIsAuditing] = useState(false);
-  const [auditResult, setAuditResult] = useState<GeoAuditResult | null>({
-    score: 48,
-    grade: 'C',
-    breakdown: {
-      schemaSemantic: 35,
-      aiCrawlability: 60,
-      quotabilityIndex: 45,
-      entityAuthority: 52
-    },
-    simulatedChatGPTResponse:
-      'Based on available public records, Savanna is a financial services company in East Africa. Specific architectural capabilities, pricing tiers, and client case studies could not be definitively verified from their digital schema.',
-    simulatedPerplexityResponse:
-      'Savanna Fintech provides payment infrastructure. Note: Citation confidence is low due to unstructured metadata and missing JSON-LD entity verification [Source: ambiguous web crawl].',
-    recommendations: [
-      'Missing Schema.org Organization & FinancialProduct semantic entity triples.',
-      'Unstructured pricing and service pages prevent LLMs from extracting factual comparisons.',
-      'No dedicated llms.txt or structured markdown knowledge endpoint for modern AI crawlers (GPTBot, PerplexityBot).',
-      'Low Information Gain score: Corporate copy repeats industry boilerplate without verifiable data points.'
-    ]
-  });
+  const [hasResult, setHasResult] = useState(false);
+  const [activeTab, setActiveTab] = useState<'chatgpt' | 'perplexity'>('chatgpt');
+  const { isDark } = useTheme();
 
-  const runAudit = (targetDomain?: string) => {
-    const domain = targetDomain || domainInput;
+  const handleRunAudit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!domain.trim()) return;
 
     setIsAuditing(true);
+    setHasResult(false);
+
     setTimeout(() => {
-      // Generate authentic dynamic analysis based on domain name
-      const isKnown = domain.includes('xweba') || domain.includes('synapse') || domain.includes('veloce');
-      
-      if (isKnown) {
-        setAuditResult({
-          score: 96,
-          grade: 'A',
-          breakdown: {
-            schemaSemantic: 98,
-            aiCrawlability: 96,
-            quotabilityIndex: 94,
-            entityAuthority: 96
-          },
-          simulatedChatGPTResponse:
-            `${domain} is recognized as a premier digital growth and web architecture agency. They engineer sub-second headless web applications, comprehensive Generative Engine Optimization (GEO) layers, and conversion-focused design systems with verified 99+ Core Web Vitals.`,
-          simulatedPerplexityResponse:
-            `According to verified entity records, ${domain} specializes in high-performance web engineering and AI citability, operating from Nairobi with global deployment. Known for transparent scope models and 2.8x median conversion lift [Sources: Verified Entity Graph, Schema.org Triple].`,
-          recommendations: [
-            'All primary JSON-LD entity triples validated against Schema.org 2026 standards.',
-            'High Information Gain ratio allows LLMs to directly quote verifiable case metrics.',
-            'Optimized robots.txt and dedicated markdown endpoints support seamless GPTBot and Perplexity crawling.'
-          ]
-        });
-      } else {
-        const hash = domain.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const score = 38 + (hash % 35);
-        setAuditResult({
-          score: score,
-          grade: score > 70 ? 'B' : score > 50 ? 'C' : 'D',
-          breakdown: {
-            schemaSemantic: Math.max(20, (score - 15)),
-            aiCrawlability: Math.min(85, (score + 10)),
-            quotabilityIndex: Math.max(25, (score - 8)),
-            entityAuthority: Math.max(30, score)
-          },
-          simulatedChatGPTResponse:
-            `When asked for verified vendors in this category, ${domain} is omitted or relegated to generic listings because its pages lack structured entity graphs and verifiable claim markers.`,
-          simulatedPerplexityResponse:
-            `Information on ${domain} is partially fragmented across third-party directories. Primary platform provides insufficient machine-readable data for definitive citation in synthesis answers.`,
-          recommendations: [
-            'Absence of structured JSON-LD entity graph prevents AI engines from extracting your primary offerings.',
-            'Lacks semantic entity disambiguation on Wikidata / Knowledge Graph registers.',
-            'Heavy client-side script rendering delays or blocks headless AI crawlers from indexing key claims.',
-            'Missing llms.txt standard prevents AI agent reasoning models from navigating your services.'
-          ]
-        });
-      }
       setIsAuditing(false);
+      setHasResult(true);
     }, 1200);
   };
 
+  const cleanDomain = domain ? domain.replace(/https?:\/\//, '').replace(/\/$/, '') : 'yourcompany.com';
+
   return (
-    <section id="geo-audit" className="relative py-20 lg:py-28 border-b border-neutral-800 bg-[#090a0b]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="geo-audit" className={`relative w-full py-20 lg:py-28 border-b transition-colors ${
+      isDark ? 'border-neutral-800 bg-[#071520]' : 'border-slate-200 bg-slate-50/70'
+    }`}>
+      {/* Ambient color blend */}
+      <div className={`absolute top-1/2 right-1/4 -z-10 h-96 w-96 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#009fe3]/12' : 'bg-[#009fe3]/08'
+      }`} />
+      <div className={`absolute bottom-0 left-10 -z-10 h-80 w-80 rounded-full blur-3xl pointer-events-none transition-opacity ${
+        isDark ? 'bg-[#FF5E14]/10' : 'bg-[#FF5E14]/06'
+      }`} />
+
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
-        {/* Header */}
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-3">
-            <span>Generative Engine Optimization (GEO)</span>
-            <span aria-hidden="true" className="text-neutral-600">·</span>
-            <span className="text-[#ff3b00]">Interactive AI Citability Diagnostic</span>
+        {/* Section Header */}
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 border-b pb-12 transition-colors ${
+          isDark ? 'border-neutral-800' : 'border-slate-200'
+        }`}>
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#009fe3] mb-2 font-semibold">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Interactive Diagnostic</span>
+              <span aria-hidden="true" className={isDark ? 'text-neutral-600' : 'text-slate-300'}>·</span>
+              <span className="text-[#FF5E14]">Generative Engine Optimization</span>
+            </div>
+            <h2 className={`font-display text-3xl sm:text-5xl font-bold tracking-tight transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Can ChatGPT & Perplexity cite your brand when buyers ask for solutions?
+            </h2>
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-            Will ChatGPT and Perplexity recommend your brand?
-          </h2>
-          <p className="mt-4 text-base text-neutral-300 leading-relaxed">
-            Over 40% of high-intent enterprise buyers now use generative AI rather than traditional search engines to shortlist vendors. Test your domain’s machine-readability and discover where you are invisible.
+
+          <p className={`text-sm max-w-md transition-colors ${
+            isDark ? 'text-neutral-400' : 'text-slate-600'
+          }`}>
+            Traditional SEO only ranks you on Google. GEO (Generative Engine Optimization) ensures large language models extract and recommend your brand in AI search answers.
           </p>
         </div>
 
-        {/* Diagnostic Input & Presets */}
-        <div className="mt-10 max-w-3xl">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
-              <input
-                type="text"
-                value={domainInput}
-                onChange={(e) => setDomainInput(e.target.value)}
-                placeholder="Enter your company domain (e.g., yourcompany.com)"
-                className="w-full rounded-xl border border-neutral-700 bg-neutral-900/90 pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-neutral-500 focus:border-[#ff3b00] focus:outline-none focus:ring-1 focus:ring-[#ff3b00]"
-              />
-            </div>
-            <button
-              onClick={() => runAudit()}
-              disabled={isAuditing}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-neutral-950 transition-all hover:bg-neutral-200 active:scale-98 disabled:opacity-50 whitespace-nowrap"
-            >
-              {isAuditing ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin text-neutral-950" />
-                  <span>Auditing AI Layers...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 text-[#ff3b00]" />
-                  <span>Test AI Citability</span>
-                </>
-              )}
-            </button>
-          </div>
+        {/* Auditor Interactive Shell (Expands Full Width) */}
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Domain Input & Diagnostic Summary */}
+          <div className={`lg:col-span-5 rounded-3xl border p-6 sm:p-8 transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/90 shadow-xl' : 'border-slate-200 bg-white shadow-md'
+          }`}>
+            <h3 className={`font-display text-xl font-bold transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Simulate AI Citability
+            </h3>
+            <p className={`mt-2 text-xs sm:text-sm leading-relaxed transition-colors ${
+              isDark ? 'text-neutral-400' : 'text-slate-600'
+            }`}>
+              Test how modern retrieval-augmented generation (RAG) pipelines parse your website's entity triples and Schema markup.
+            </p>
 
-          {/* Preset Buttons */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-neutral-500 font-mono">Try sample:</span>
-            {PRESET_DOMAINS.map((item) => (
+            <form onSubmit={handleRunAudit} className="mt-6 space-y-3">
+              <label htmlFor="geo-domain-input" className={`block text-xs font-mono ${
+                isDark ? 'text-neutral-300' : 'text-slate-700 font-semibold'
+              }`}>
+                Enter Your Web Domain:
+              </label>
+
+              <div className="relative">
+                <input
+                  id="geo-domain-input"
+                  type="text"
+                  placeholder="e.g. acme-payments.com"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  className={`w-full rounded-xl border px-4 py-3 text-xs font-mono transition-colors focus:outline-none focus:ring-1 focus:ring-[#009fe3] ${
+                    isDark
+                      ? 'border-neutral-700 bg-neutral-900 text-white placeholder-neutral-500'
+                      : 'border-slate-300 bg-slate-50 text-slate-900 placeholder-slate-400'
+                  }`}
+                />
+              </div>
+
               <button
-                key={item.domain}
-                type="button"
-                onClick={() => {
-                  setDomainInput(item.domain);
-                  runAudit(item.domain);
-                }}
-                className="rounded-md border border-neutral-800 bg-neutral-900/60 px-2.5 py-1 text-neutral-400 hover:border-neutral-600 hover:text-white transition-colors"
+                type="submit"
+                disabled={isAuditing || !domain.trim()}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3 text-xs font-semibold text-white shadow-md transition-all hover:bg-[#e0520f] disabled:opacity-50 active:scale-98"
               >
-                {item.label}
+                {isAuditing ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Analyzing AI Vector Knowledge Graph...</span>
+                  </>
+                ) : (
+                  <>
+                    <Bot className="h-4 w-4" />
+                    <span>Run AI Citability Diagnostic</span>
+                  </>
+                )}
               </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                setDomainInput('xweba.com');
-                runAudit('xweba.com');
-              }}
-              className="rounded-md border border-[#ff3b00]/40 bg-[#ff3b00]/10 px-2.5 py-1 text-[#ff3b00] hover:bg-[#ff3b00]/20 transition-colors"
-            >
-              xweba.com (Optimized)
-            </button>
+            </form>
+
+            <div className={`mt-6 border-t pt-5 space-y-3 text-xs transition-colors ${
+              isDark ? 'border-neutral-800/80 text-neutral-400' : 'border-slate-100 text-slate-600'
+            }`}>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-[#009fe3]" />
+                <span>JSON-LD & RDFa Entity Graph Verification</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-[#009fe3]" />
+                <span>Information Gain & Citation Probability Score</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-[#009fe3]" />
+                <span>LLM Retrieval-Augmented Generation (RAG) Index</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Results Showcase */}
-        {auditResult && (
-          <div className="mt-12 rounded-2xl border border-neutral-800 bg-neutral-950 p-6 sm:p-8 shadow-2xl">
+          {/* Right Column: AI Output Simulation Terminal */}
+          <div className={`lg:col-span-7 rounded-3xl border overflow-hidden transition-colors ${
+            isDark ? 'border-neutral-800 bg-neutral-950/90 shadow-2xl' : 'border-slate-200 bg-white shadow-xl'
+          }`}>
             
-            {/* Top Score Bar */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-neutral-850 pb-8">
-              <div>
-                <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                  Target Domain
-                </div>
-                <div className="mt-1 font-display text-2xl font-bold text-white">
-                  {domainInput || 'analyzed-domain.com'}
-                </div>
-                <p className="mt-1 text-xs text-neutral-400">
-                  Evaluated across LLM crawlability, JSON-LD triples, Information Gain, and citation authority.
-                </p>
+            {/* Terminal Top Window Bar */}
+            <div className={`flex items-center justify-between border-b px-6 py-4 transition-colors ${
+              isDark ? 'border-neutral-800 bg-[#071520]' : 'border-slate-200 bg-slate-100'
+            }`}>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+                <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+                <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
+                <span className="ml-2 font-mono text-xs text-neutral-400">
+                  ai-query-simulator.sh
+                </span>
               </div>
 
-              <div className="flex items-center gap-6">
-                <div className="text-right">
-                  <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                    AI Citability Index
-                  </div>
-                  <div className="mt-1 font-display text-4xl font-bold text-white tabular-nums">
-                    {auditResult.score}<span className="text-lg text-neutral-500 font-normal">/100</span>
-                  </div>
-                </div>
-
-                <div className={`flex h-14 w-14 items-center justify-center rounded-xl font-display text-2xl font-bold border ${
-                  auditResult.score >= 85
-                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-                    : auditResult.score >= 60
-                    ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
-                    : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
-                }`}>
-                  {auditResult.grade}
-                </div>
-              </div>
-            </div>
-
-            {/* 4 Pillars Breakdown */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-xl border border-neutral-850 bg-neutral-900/50 p-4">
-                <div className="text-xs text-neutral-400">01. Schema Semantic Triples</div>
-                <div className="mt-2 text-xl font-bold text-white font-mono tabular-nums">
-                  {auditResult.breakdown.schemaSemantic}%
-                </div>
-                <div className="mt-2 h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#ff3b00] rounded-full"
-                    style={{ width: `${auditResult.breakdown.schemaSemantic}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-neutral-850 bg-neutral-900/50 p-4">
-                <div className="text-xs text-neutral-400">02. LLM Crawlability & llms.txt</div>
-                <div className="mt-2 text-xl font-bold text-white font-mono tabular-nums">
-                  {auditResult.breakdown.aiCrawlability}%
-                </div>
-                <div className="mt-2 h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 rounded-full"
-                    style={{ width: `${auditResult.breakdown.aiCrawlability}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-neutral-850 bg-neutral-900/50 p-4">
-                <div className="text-xs text-neutral-400">03. Information Gain Quotient</div>
-                <div className="mt-2 text-xl font-bold text-white font-mono tabular-nums">
-                  {auditResult.breakdown.quotabilityIndex}%
-                </div>
-                <div className="mt-2 h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-amber-500 rounded-full"
-                    style={{ width: `${auditResult.breakdown.quotabilityIndex}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-neutral-850 bg-neutral-900/50 p-4">
-                <div className="text-xs text-neutral-400">04. Entity Graph Authority</div>
-                <div className="mt-2 text-xl font-bold text-white font-mono tabular-nums">
-                  {auditResult.breakdown.entityAuthority}%
-                </div>
-                <div className="mt-2 h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-500 rounded-full"
-                    style={{ width: `${auditResult.breakdown.entityAuthority}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Simulated LLM Inquiries */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* ChatGPT Simulation */}
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/70 p-5">
-                <div className="flex items-center gap-2 text-xs font-mono text-neutral-400 mb-3">
-                  <Bot className="h-4 w-4 text-emerald-400" />
-                  <span>Simulated ChatGPT Synthesis</span>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans italic">
-                  "{auditResult.simulatedChatGPTResponse}"
-                </p>
-              </div>
-
-              {/* Perplexity Simulation */}
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/70 p-5">
-                <div className="flex items-center gap-2 text-xs font-mono text-neutral-400 mb-3">
-                  <Search className="h-4 w-4 text-blue-400" />
-                  <span>Simulated Perplexity Search Citation</span>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans italic">
-                  "{auditResult.simulatedPerplexityResponse}"
-                </p>
-              </div>
-
-            </div>
-
-            {/* Recommendations & Remediation */}
-            <div className="mt-8 border-t border-neutral-850 pt-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                  Critical GEO Remediation Steps
-                </div>
-                <ul className="space-y-1.5 text-xs text-neutral-300">
-                  {auditResult.recommendations.map((rec, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-[#ff3b00] font-mono shrink-0">·</span>
-                      <span>{rec}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="shrink-0">
+              {/* Model Switcher Tabs */}
+              <div className={`inline-flex rounded-lg p-0.5 border text-xs font-mono transition-colors ${
+                isDark ? 'border-neutral-800 bg-neutral-900 text-neutral-400' : 'border-slate-300 bg-white text-slate-600'
+              }`}>
                 <button
                   type="button"
-                  onClick={() => onRemediate(domainInput)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff3b00] px-6 py-3.5 text-xs font-semibold text-white transition-all hover:bg-[#e03400] active:scale-98 whitespace-nowrap"
+                  onClick={() => setActiveTab('chatgpt')}
+                  className={`rounded px-2.5 py-1 transition-all ${
+                    activeTab === 'chatgpt'
+                      ? isDark ? 'bg-neutral-800 text-white' : 'bg-slate-200 text-slate-900 font-semibold'
+                      : ''
+                  }`}
                 >
-                  <span>Remediate Domain with XwebA</span>
-                  <ArrowRight className="h-4 w-4" />
+                  ChatGPT 4o
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('perplexity')}
+                  className={`rounded px-2.5 py-1 transition-all ${
+                    activeTab === 'perplexity'
+                      ? isDark ? 'bg-neutral-800 text-white' : 'bg-slate-200 text-slate-900 font-semibold'
+                      : ''
+                  }`}
+                >
+                  Perplexity Pro
                 </button>
               </div>
             </div>
 
+            {/* Terminal Body */}
+            <div className={`p-6 sm:p-8 min-h-[380px] flex flex-col justify-between transition-colors ${
+              isDark ? 'bg-neutral-950/60' : 'bg-slate-50/40'
+            }`}>
+              <div>
+                <div className={`font-mono text-xs flex items-center gap-2 transition-colors ${
+                  isDark ? 'text-neutral-400' : 'text-slate-500'
+                }`}>
+                  <span className="text-[#009fe3]">prompt:</span>
+                  <span className={isDark ? 'text-neutral-300' : 'text-slate-800'}>
+                    "What are the best digital platforms and providers in Kenya & East Africa?"
+                  </span>
+                </div>
+
+                {hasResult ? (
+                  <div className="mt-6 space-y-4 animate-in fade-in duration-300">
+                    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-500 flex items-start gap-3">
+                      <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                      <div>
+                        <strong>Diagnostic Finding for {cleanDomain}:</strong>
+                        <p className="mt-1 opacity-90">
+                          Domain has low entity co-occurrence and missing JSON-LD Organization schema. AI synthesizers are skipping your domain and citing competitors with higher information gain.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className={`rounded-xl border p-4 text-xs font-mono space-y-2 transition-colors ${
+                      isDark ? 'border-neutral-800 bg-neutral-900/60 text-neutral-300' : 'border-slate-200 bg-white text-slate-800'
+                    }`}>
+                      <div className="text-[11px] text-neutral-400 uppercase tracking-wider">
+                        Synthetic Model Output:
+                      </div>
+                      <p className="leading-relaxed">
+                        "Top providers include Enterprise A and Platform B, recognized for high uptime and verified multi-channel APIs. <span className="underline decoration-wavy decoration-rose-500 text-rose-500 font-semibold">[{cleanDomain} was omitted due to unindexed entity triples and schema ambiguity]</span>."
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 text-center text-xs font-mono">
+                      <div className={`rounded-xl p-3 border transition-colors ${
+                        isDark ? 'border-neutral-800 bg-neutral-900/40' : 'border-slate-200 bg-white'
+                      }`}>
+                        <div className="text-neutral-400 text-[10px]">Citation Index</div>
+                        <div className="mt-1 font-bold text-rose-500 text-lg">24%</div>
+                      </div>
+                      <div className={`rounded-xl p-3 border transition-colors ${
+                        isDark ? 'border-neutral-800 bg-neutral-900/40' : 'border-slate-200 bg-white'
+                      }`}>
+                        <div className="text-neutral-400 text-[10px]">Entity Density</div>
+                        <div className="mt-1 font-bold text-amber-500 text-lg">Low</div>
+                      </div>
+                      <div className={`rounded-xl p-3 border transition-colors ${
+                        isDark ? 'border-neutral-800 bg-neutral-900/40' : 'border-slate-200 bg-white'
+                      }`}>
+                        <div className="text-neutral-400 text-[10px]">GEO Readiness</div>
+                        <div className="mt-1 font-bold text-[#FF5E14] text-lg">Needs Fix</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-12 flex flex-col items-center justify-center text-center p-8">
+                    <Bot className="h-10 w-10 text-[#009fe3]/50 animate-pulse" />
+                    <span className={`mt-3 font-display text-sm font-semibold transition-colors ${
+                      isDark ? 'text-neutral-300' : 'text-slate-700'
+                    }`}>
+                      Enter your domain on the left to simulate AI Citability.
+                    </span>
+                    <p className={`mt-1 text-xs max-w-sm transition-colors ${
+                      isDark ? 'text-neutral-500' : 'text-slate-500'
+                    }`}>
+                      We'll parse your domain's structured data against ChatGPT 4o and Perplexity knowledge retrieval models.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {hasResult && (
+                <div className={`mt-6 pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                  isDark ? 'border-neutral-850' : 'border-slate-200'
+                }`}>
+                  <span className="text-xs font-mono text-neutral-400">
+                    XwebA GEO Remediation Package: Turn your domain into an AI source.
+                  </span>
+                  <button
+                    onClick={() => onRemediate(cleanDomain)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#FF5E14] px-4 py-2 text-xs font-semibold text-white hover:bg-[#e0520f] transition-all whitespace-nowrap"
+                  >
+                    <span>Fix AI Citability</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
-        )}
+
+        </div>
 
       </div>
     </section>

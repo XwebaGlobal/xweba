@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-display: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -9,30 +11,75 @@
   --color-hostinger: #673de6;
 }
 
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
   background-color: #071520;
   color: #ededed;
-  overflow-x: hidden;
 }
 
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
 
-/* Custom scrollbar */
+/* Color Blend Gradient Utilities */
+.color-blend-ambient {
+  background: radial-gradient(circle at 15% 20%, rgba(0, 159, 227, 0.09) 0%, transparent 50%),
+              radial-gradient(circle at 85% 30%, rgba(255, 94, 20, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 50% 80%, rgba(103, 61, 230, 0.05) 0%, transparent 50%);
+}
+
+html.dark .color-blend-ambient {
+  background: radial-gradient(circle at 15% 20%, rgba(0, 159, 227, 0.15) 0%, transparent 45%),
+              radial-gradient(circle at 85% 30%, rgba(255, 94, 20, 0.12) 0%, transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(103, 61, 230, 0.08) 0%, transparent 50%);
+}
+
+.color-blend-surface-light {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.color-blend-surface-dark {
+  background: linear-gradient(135deg, rgba(12, 31, 48, 0.7) 0%, rgba(7, 21, 32, 0.9) 100%);
+  border: 1px solid rgba(0, 159, 227, 0.15);
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html.dark ::-webkit-scrollbar-track {
   background: #071520;
 }
 ::-webkit-scrollbar-thumb {
-  background: #162b3d;
+  background: #cbd5e1;
   border-radius: 3px;
 }
+html.dark ::-webkit-scrollbar-thumb {
+  background: #162b3d;
+}
 ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
   background: #233e54;
 }
-
