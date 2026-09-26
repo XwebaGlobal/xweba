@@ -60,7 +60,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       icon: <Globe className="h-4 w-4 text-[#673de6]" />,
       action: () => {
         onClose();
-        window.open('https://www.hostinger.com?REFERRALCODE=1JOHN0542', '_blank', 'noopener,noreferrer');
+        const a = document.createElement('a');
+        a.href = 'https://www.hostinger.com?REFERRALCODE=1JOHN0542';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
     },
     {
