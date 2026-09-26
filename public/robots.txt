@@ -1,0 +1,5 @@
+# robots.txt for https://xweba.com
+User-agent: *
+Allow: /
+
+Sitemap: https://xweba.com/sitemap.xml

@@ -1,10 +1,16 @@
 import { ServiceItem, CaseStudy } from '../types';
 import heroWomanImg from '../assets/images/woman_working_hero_1790379454171.jpg';
+import teamHeroImg from '../assets/images/team_xweba_hero_1790172978907.jpg';
+import designerImg from '../assets/images/designer_xweba_studio_1790172994004.jpg';
+import collaborationImg from '../assets/images/collaboration_xweba_pair_1790173003872.jpg';
+import fintechImg from '../assets/images/work_fintech_showcase_1790172158575.jpg';
+import luxuryImg from '../assets/images/work_luxury_brand_1790172170494.jpg';
+import aiPlatformImg from '../assets/images/work_ai_platform_1790172182690.jpg';
 
 export const HERO_IMAGE = heroWomanImg;
-export const TEAM_HERO_IMAGE = '/src/assets/images/team_xweba_hero_1790172978907.jpg';
-export const DESIGNER_IMAGE = '/src/assets/images/designer_xweba_studio_1790172994004.jpg';
-export const COLLABORATION_IMAGE = '/src/assets/images/collaboration_xweba_pair_1790173003872.jpg';
+export const TEAM_HERO_IMAGE = teamHeroImg;
+export const DESIGNER_IMAGE = designerImg;
+export const COLLABORATION_IMAGE = collaborationImg;
 
 export const HOSTINGER_REFERRAL_URL = 'https://www.hostinger.com?REFERRALCODE=1JOHN0542';
 
@@ -144,8 +150,8 @@ export const CASE_STUDIES: ExtendedCaseStudy[] = [
     categoryLabel: 'Web Platform & Portal',
     title: 'Re-engineering a multi-stage capital platform for institutional investors',
     summary: 'A bespoke edge-rendered web application with real-time portfolio telemetry, sub-second latency, and seamless investor inquiry funnels.',
-    image: '/src/assets/images/work_fintech_showcase_1790172158575.jpg',
-    imageUrl: '/src/assets/images/work_fintech_showcase_1790172158575.jpg',
+    image: fintechImg,
+    imageUrl: fintechImg,
     challenge: 'Veloce Capital operated on an outdated WordPress CMS that took over 4.8 seconds to load, suffered from frequent plugin conflicts, and failed to project institutional authority.',
     solution: 'Engineered a custom React application with server-rendered static generation, zero external analytics bloat, a secure investor document portal, and automated accreditation intake.',
     results: '+192% qualified investor inquiries, 0.42s global edge latency, and 99/100 Core Web Vitals score.',
@@ -174,8 +180,8 @@ export const CASE_STUDIES: ExtendedCaseStudy[] = [
     categoryLabel: 'Identity & Editorial Web',
     title: 'Minimalist brand identity and digital portfolio for a premier luxury architectural studio',
     summary: 'Restrained typography, tactile imagery showcases, and custom editorial layout showcasing multi-million dollar residential projects.',
-    image: '/src/assets/images/work_luxury_brand_1790172170494.jpg',
-    imageUrl: '/src/assets/images/work_luxury_brand_1790172170494.jpg',
+    image: luxuryImg,
+    imageUrl: luxuryImg,
     challenge: 'Aura needed a digital presence that matched the tactile, understated luxury of their physical buildings without relying on generic agency templates.',
     solution: 'Crafted a bespoke visual identity featuring custom typographic scale, asymmetric editorial project grids, and an interactive spatial archive with zero visual noise.',
     results: '+280% increase in high-ticket client inquiries, with contracts averaging over $120k.',
@@ -204,8 +210,8 @@ export const CASE_STUDIES: ExtendedCaseStudy[] = [
     categoryLabel: 'GEO & Platform Engineering',
     title: 'Generative Engine Optimization (GEO) & repositioning for an enterprise AI data stack',
     summary: 'Comprehensive entity restructuring and technical documentation architecture resulting in #1 AI citations across ChatGPT and Perplexity.',
-    image: '/src/assets/images/work_ai_platform_1790172182690.jpg',
-    imageUrl: '/src/assets/images/work_ai_platform_1790172182690.jpg',
+    image: aiPlatformImg,
+    imageUrl: aiPlatformImg,
     challenge: 'Synapse was frequently ignored by AI search engines like Perplexity and ChatGPT when buyers asked for enterprise data integration recommendations due to poor schema markup.',
     solution: 'Designed and deployed full JSON-LD semantic triples, an open markdown knowledge base, and rewritten value propositions optimized for LLM information gain extraction.',
     results: '3.8x increase in AI citations across ChatGPT, Perplexity, and Gemini, with 64% reduction in enterprise customer acquisition cost.',
