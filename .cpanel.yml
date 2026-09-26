@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/public_html/
+    # If build directory exists, copy all files and folders
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -rf dist/* $DEPLOYPATH
+    # Ensure critical .htaccess and metadata files are placed in public_html
+    - /bin/cp -f public/.htaccess $DEPLOYPATH/.htaccess
+    - /bin/cp -f public/robots.txt $DEPLOYPATH/robots.txt
+    - /bin/cp -f public/sitemap.xml $DEPLOYPATH/sitemap.xml
