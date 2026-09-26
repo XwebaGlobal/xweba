@@ -1,6 +1,6 @@
 # ==============================================================================
 # Hostinger & cPanel Apache / LiteSpeed Configuration for XwebA React SPA
-# (If your system hid .htaccess, rename this file to: .htaccess)
+# (If your system or File Manager hid .htaccess, rename this file to: .htaccess)
 # ==============================================================================
 
 # Disable directory browsing
@@ -18,7 +18,35 @@ DirectoryIndex index.html
   RewriteCond %{SCRIPT_FILENAME} -f
   RewriteRule "(^|/)\.(?!well-known)" - [F]
 
-  # Don't rewrite existing files or directories
+  # ----------------------------------------------------------------------------
+  # 1. GIT DEPLOYMENT AUTO-ROUTING (When entire repository is cloned to public_html)
+  # If dist/ exists, automatically serve production assets and index.html from dist/
+  # ----------------------------------------------------------------------------
+  # Route static file requests to dist/ if file exists there
+  RewriteCond %{REQUEST_URI} !^/dist/
+  RewriteCond %{DOCUMENT_ROOT}/dist/$1 -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}/dist/$1 -d
+  RewriteRule ^(.*)$ dist/$1 [L]
+
+  # Fallback relative check for LiteSpeed / chroot environments
+  RewriteCond %{REQUEST_URI} !^/dist/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond dist/$1 -f
+  RewriteRule ^(.*)$ dist/$1 [L]
+
+  # Route root and SPA routes to dist/index.html if dist/index.html exists
+  RewriteCond %{REQUEST_URI} !^/dist/
+  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+  RewriteRule ^.*$ dist/index.html [L]
+
+  RewriteCond %{REQUEST_URI} !^/dist/
+  RewriteCond dist/index.html -f
+  RewriteRule ^.*$ dist/index.html [L]
+
+  # ----------------------------------------------------------------------------
+  # 2. DIRECT DEPLOYMENT (When dist contents are uploaded directly to public_html)
+  # ----------------------------------------------------------------------------
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]

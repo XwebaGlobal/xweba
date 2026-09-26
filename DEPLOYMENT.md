@@ -55,6 +55,17 @@ Upload all contents of `dist/`:
 
 We have created an automated CI/CD pipeline in `.github/workflows/deploy-hostinger-cpanel.yml`. Whenever you push to your GitHub `main` branch, GitHub Actions automatically builds the project and uploads `dist/` directly into `public_html/`.
 
+---
+
+## ⚡ Option 2B: Direct Git Clone / Hostinger Git Integration (No Build Step Required on Server)
+
+**The `dist/` production build is now directly committed and tracked in the repository.**
+
+When Hostinger Git pulls the repository into `public_html/`:
+1. The pre-compiled JavaScript, CSS, and optimized assets in `dist/` are downloaded directly.
+2. The root `.htaccess` and `index.php` automatically detect the `dist/` folder and forward all traffic to `dist/index.html` and `dist/assets/`.
+3. You do not need to install Node.js or run `npm run build` on the Hostinger shared server — it works immediately after `git pull`!
+
 ### Step 1: Push your code to GitHub
 ```bash
 git add .
