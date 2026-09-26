@@ -31,6 +31,12 @@ jobs:
           test -f dist/.htaccess || { echo "dist/.htaccess missing!"; exit 1; }
 
       - name: 🚀 Deploy to Hostinger / cPanel via FTPS
+        if: ${{ env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != '' }}
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT || '21' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -41,3 +47,17 @@ jobs:
           local-dir: ./dist/
           server-dir: ./public_html/
           dangerous-clean-slate: false
+
+      - name: ℹ️ Notice: FTP Secrets Not Set (Skipping FTP upload)
+        if: ${{ env.FTP_SERVER == '' || env.FTP_USERNAME == '' || env.FTP_PASSWORD == '' }}
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          echo "::notice title=Build Succeeded & FTP Secrets Not Configured::Vite production build verified in dist/."
+          echo "To enable automated FTP/FTPS deployment on push, add the following GitHub Secrets in Settings -> Secrets and variables -> Actions:"
+          echo "  - FTP_SERVER (from Hostinger hPanel > FTP Accounts)"
+          echo "  - FTP_USERNAME"
+          echo "  - FTP_PASSWORD"
+          echo "If you are deploying using Hostinger's native Git deployment, no FTP secrets are needed — the dist/ folder is already tracked and ready."
