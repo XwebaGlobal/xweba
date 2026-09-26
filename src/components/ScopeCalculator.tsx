@@ -245,11 +245,15 @@ export const ScopeCalculator: React.FC<ScopeCalculatorProps> = ({ onPreloadBrief
               </h3>
 
               {/* Big Price Tag */}
-              <div className="mt-6 border-b pb-6 border-neutral-800">
-                <div className="text-xs font-mono text-neutral-400">Turnkey Fixed Budget:</div>
-                <div className="mt-1 font-mono text-4xl sm:text-5xl font-bold text-white flex items-baseline gap-1">
+              <div className={`mt-6 border-b pb-6 ${
+                isDark ? 'border-neutral-800' : 'border-slate-200'
+              }`}>
+                <div className={`text-xs font-mono ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>Turnkey Fixed Budget:</div>
+                <div className={`mt-1 font-mono text-4xl sm:text-5xl font-bold flex items-baseline gap-1 ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
                   <span className="text-[#FF5E14]">${totalCost.toLocaleString()}</span>
-                  <span className="text-xs text-neutral-400 font-normal">USD</span>
+                  <span className={`text-xs font-normal ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>USD</span>
                 </div>
                 <div className="mt-2 text-xs font-mono text-[#009fe3]">
                   Sprint Duration: ~{totalWeeks} Weeks to Launch
@@ -272,7 +276,9 @@ export const ScopeCalculator: React.FC<ScopeCalculatorProps> = ({ onPreloadBrief
                   <span>Active Addons ({selectedAddons.length}):</span>
                   <span className="font-mono">${addonsCost.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-neutral-800 text-emerald-400 font-semibold">
+                <div className={`flex justify-between pt-2 border-t ${
+                  isDark ? 'border-neutral-800' : 'border-slate-200'
+                } text-emerald-500 font-semibold`}>
                   <a
                     href="https://www.hostinger.com?REFERRALCODE=1JOHN0542"
                     target="_blank"
@@ -281,7 +287,7 @@ export const ScopeCalculator: React.FC<ScopeCalculatorProps> = ({ onPreloadBrief
                     title="Hostinger Cloud Setup - Referral Discount"
                   >
                     <span>Hostinger Cloud Setup:</span>
-                    <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400">Partner</span>
+                    <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-500">Partner</span>
                   </a>
                   <span>INCLUDED ($0)</span>
                 </div>

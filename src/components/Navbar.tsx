@@ -195,43 +195,43 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenConsultation, onOpenComman
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Mobile navigation drawer */}
-      {mobileMenuOpen && (
-        <div className={`fixed inset-x-0 top-24 z-30 border-b px-6 py-6 xl:hidden shadow-2xl transition-colors ${
-          isDark ? 'border-neutral-800 bg-[#071520] text-neutral-200' : 'border-slate-200 bg-white text-slate-800'
-        }`}>
-          <div className="flex flex-col gap-3 text-sm font-medium">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className={`py-2 border-b transition-colors ${
-                  isDark
-                    ? 'border-neutral-850 text-neutral-300 hover:text-cyan-400'
-                    : 'border-slate-100 text-slate-700 hover:text-[#009fe3]'
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
-            <div className="pt-3 flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenConsultation();
-                }}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3 text-sm font-semibold text-white hover:bg-[#e0520f] transition-colors"
-              >
-                <span>Book Strategy Call</span>
-                <ArrowUpRight className="h-4 w-4" />
-              </button>
+        {/* Mobile navigation drawer cleanly attached to header */}
+        {mobileMenuOpen && (
+          <div className={`w-full border-t px-6 py-6 xl:hidden shadow-2xl transition-colors ${
+            isDark ? 'border-neutral-800 bg-[#071520] text-neutral-200' : 'border-slate-200 bg-white text-slate-800'
+          }`}>
+            <div className="flex flex-col gap-3 text-sm font-medium">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`py-2 border-b transition-colors ${
+                    isDark
+                      ? 'border-neutral-850 text-neutral-300 hover:text-cyan-400'
+                      : 'border-slate-100 text-slate-700 hover:text-[#009fe3]'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="pt-3 flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenConsultation();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3 text-sm font-semibold text-white hover:bg-[#e0520f] transition-colors"
+                >
+                  <span>Book Strategy Call</span>
+                  <ArrowUpRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </header>
     </>
   );
 };

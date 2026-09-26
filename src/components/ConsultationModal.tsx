@@ -35,6 +35,21 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
+  // Sync incoming preloaded brief data whenever modal opens or changes
+  React.useEffect(() => {
+    if (isOpen) {
+      setSubmitted(false);
+      setError('');
+      setFormData(prev => ({
+        ...prev,
+        currentWebsite: initialData?.domain || prev.currentWebsite,
+        timeline: initialData?.timeline || prev.timeline || 'Within 4-8 weeks',
+        budgetTier: initialData?.estimatedCost || prev.budgetTier || '$5,000 - $10,000',
+        projectFocus: initialData?.serviceName || prev.projectFocus || 'High-Performance Web Platform & GEO',
+      }));
+    }
+  }, [isOpen, initialData]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {

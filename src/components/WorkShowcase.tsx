@@ -15,15 +15,18 @@ export const WorkShowcase: React.FC<WorkShowcaseProps> = ({ onOpenConsultation }
 
   const categories = [
     { id: 'all', label: 'All Architectures' },
-    { id: 'Fintech', label: 'Fintech & Payments' },
-    { id: 'Luxury & E-commerce', label: 'Luxury Commerce' },
-    { id: 'AI & Enterprise', label: 'AI Platform' }
+    { id: 'fintech', label: 'Fintech & Payments' },
+    { id: 'luxury', label: 'Luxury Commerce' },
+    { id: 'ai', label: 'AI Platform' }
   ];
 
   const filteredStudies =
     selectedCategory === 'all'
       ? CASE_STUDIES
-      : CASE_STUDIES.filter((s) => s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+      : CASE_STUDIES.filter((s) => {
+          const searchCorpus = `${s.category} ${s.categoryLabel || ''} ${s.industry || ''}`.toLowerCase();
+          return searchCorpus.includes(selectedCategory.toLowerCase());
+        });
 
   return (
     <section id="work" className={`relative w-full py-20 lg:py-28 border-b transition-colors ${

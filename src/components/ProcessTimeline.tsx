@@ -97,7 +97,9 @@ export const ProcessTimeline: React.FC = () => {
         </div>
 
         {/* FAQs Accordion Grid (Expands Full Width across 2 columns) */}
-        <div className="mt-20 pt-16 border-t border-neutral-800">
+        <div className={`mt-20 pt-16 border-t ${
+          isDark ? 'border-neutral-800' : 'border-slate-200'
+        }`}>
           <div className="max-w-xl mb-10">
             <span className="text-xs font-mono uppercase tracking-wider text-[#FF5E14] font-semibold">
               Transparent Details
