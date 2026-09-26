@@ -6,3 +6,12 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Ensure .htaccess and hosting configurations are always tracked by Git
+!.htaccess
+!public/.htaccess
+!htaccess.txt
+!public/htaccess.txt
+!.cpanel.yml
+!public/robots.txt
+!public/sitemap.xml
