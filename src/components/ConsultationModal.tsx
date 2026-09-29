@@ -65,6 +65,25 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
 
     setError('');
     setSubmitted(true);
+
+    // If running inside WordPress, send form submission to WordPress REST API
+    const wp = (window as unknown as { wpData?: { restUrl: string; nonce: string } }).wpData;
+    if (wp && wp.restUrl) {
+      try {
+        fetch(`${wp.restUrl}xweba/v1/consultation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': wp.nonce || ''
+          },
+          body: JSON.stringify(formData)
+        }).catch(err => {
+          console.warn('WordPress lead sync:', err);
+        });
+      } catch (err) {
+        console.warn('WordPress lead sync error:', err);
+      }
+    }
   };
 
   const handleReset = () => {

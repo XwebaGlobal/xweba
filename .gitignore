@@ -10,6 +10,10 @@ coverage/
 !dist/
 !dist/**
 
+# Ensure WordPress theme and plugin packages are tracked
+!wordpress/
+!wordpress/**
+
 # Ensure .htaccess and hosting configurations are always tracked by Git
 !.htaccess
 !public/.htaccess

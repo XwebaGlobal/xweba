@@ -1,0 +1,38 @@
+/*
+Theme Name: Xweba Global Studio
+Theme URI: https://xweba.com
+Author: Xweba Studio
+Author URI: https://xweba.com
+Description: High-performance, edge-rendered digital architecture and Generative Engine Optimization (GEO) portfolio theme for WordPress.
+Version: 1.0.0
+Requires at least: 5.8
+Tested up to: 6.7
+Requires PHP: 7.4
+License: MIT
+Text Domain: xweba
+*/
+
+/* WordPress core resets & alignment classes */
+.alignwide {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.alignfull {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+/* Ensure WordPress admin bar does not overlap fixed navigation */
+body.admin-bar header.fixed {
+  top: 32px !important;
+}
+
+@media screen and (max-width: 782px) {
+  body.admin-bar header.fixed {
+    top: 46px !important;
+  }
+}
