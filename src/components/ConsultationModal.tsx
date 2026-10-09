@@ -35,21 +35,6 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  // Sync incoming preloaded brief data whenever modal opens or changes
-  React.useEffect(() => {
-    if (isOpen) {
-      setSubmitted(false);
-      setError('');
-      setFormData(prev => ({
-        ...prev,
-        currentWebsite: initialData?.domain || prev.currentWebsite,
-        timeline: initialData?.timeline || prev.timeline || 'Within 4-8 weeks',
-        budgetTier: initialData?.estimatedCost || prev.budgetTier || '$5,000 - $10,000',
-        projectFocus: initialData?.serviceName || prev.projectFocus || 'High-Performance Web Platform & GEO',
-      }));
-    }
-  }, [isOpen, initialData]);
-
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -65,25 +50,6 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
 
     setError('');
     setSubmitted(true);
-
-    // If running inside WordPress, send form submission to WordPress REST API
-    const wp = (window as unknown as { wpData?: { restUrl: string; nonce: string } }).wpData;
-    if (wp && wp.restUrl) {
-      try {
-        fetch(`${wp.restUrl}xweba/v1/consultation`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': wp.nonce || ''
-          },
-          body: JSON.stringify(formData)
-        }).catch(err => {
-          console.warn('WordPress lead sync:', err);
-        });
-      } catch (err) {
-        console.warn('WordPress lead sync error:', err);
-      }
-    }
   };
 
   const handleReset = () => {

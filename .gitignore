@@ -1,24 +1,8 @@
 node_modules/
 build/
+dist/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
-
-# Track compiled production build for direct Hostinger & cPanel Git deployment
-!dist/
-!dist/**
-
-# Ensure WordPress theme and plugin packages are tracked
-!wordpress/
-!wordpress/**
-
-# Ensure .htaccess and hosting configurations are always tracked by Git
-!.htaccess
-!public/.htaccess
-!htaccess.txt
-!public/htaccess.txt
-!.cpanel.yml
-!public/robots.txt
-!public/sitemap.xml

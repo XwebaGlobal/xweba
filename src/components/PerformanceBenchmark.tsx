@@ -118,15 +118,13 @@ export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOp
             </div>
 
             {/* Benchmark Comparison Cards */}
-            <div className={`grid grid-cols-2 gap-4 pt-4 border-t ${
-              isDark ? 'border-neutral-800' : 'border-slate-200'
-            }`}>
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-800">
               <div className={`rounded-2xl border p-4 transition-colors ${
                 isDark ? 'border-rose-900/40 bg-rose-950/20' : 'border-rose-200 bg-rose-50/60'
               }`}>
                 <div className="text-[11px] font-mono text-rose-500 uppercase font-semibold">Standard WP / Wix Site</div>
                 <div className="mt-1 font-mono text-xl font-bold text-rose-500">3.8s TTFB</div>
-                <div className={`mt-1 text-[11px] ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>42% average mobile abandonment</div>
+                <div className="mt-1 text-[11px] text-neutral-400">42% average mobile abandonment</div>
               </div>
 
               <div className={`rounded-2xl border p-4 transition-colors ${
@@ -138,13 +136,11 @@ export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOp
                   href="https://www.hostinger.com?REFERRALCODE=1JOHN0542"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`mt-1 text-[11px] hover:text-cyan-400 hover:underline flex items-center gap-1 transition-colors ${
-                    isDark ? 'text-neutral-400' : 'text-slate-500'
-                  }`}
+                  className="mt-1 text-[11px] text-neutral-400 hover:text-cyan-400 hover:underline flex items-center gap-1 transition-colors"
                   title="Hostinger Partner Edge Infrastructure"
                 >
                   <span>Hostinger Global Edge CDN</span>
-                  <span className="text-[10px] text-emerald-500 font-mono font-semibold">20% off</span>
+                  <span className="text-[10px] text-emerald-400 font-mono">20% off</span>
                 </a>
               </div>
             </div>
@@ -159,10 +155,8 @@ export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOp
                 Annual Recaptured Pipeline Opportunity
               </span>
 
-              <div className={`mt-4 font-mono text-4xl sm:text-6xl font-bold tracking-tight ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}>
-                <span className="text-emerald-500">+${recoveredRevenueAnnual.toLocaleString()}</span>
+              <div className="mt-4 font-mono text-4xl sm:text-6xl font-bold text-white tracking-tight">
+                <span className="text-emerald-400">+${recoveredRevenueAnnual.toLocaleString()}</span>
                 <span className="text-xs font-normal text-neutral-400 block sm:inline sm:ml-2">/ year</span>
               </div>
 
@@ -177,9 +171,7 @@ export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOp
                   isDark ? 'border-neutral-800 bg-neutral-900/50' : 'border-slate-200 bg-slate-50'
                 }`}>
                   <div className="text-[11px] font-mono text-neutral-400">Monthly Recaptured Revenue</div>
-                  <div className={`mt-1 font-mono text-2xl font-bold ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}>
+                  <div className="mt-1 font-mono text-2xl font-bold text-white">
                     +${recoveredRevenueMonthly.toLocaleString()}
                   </div>
                 </div>
@@ -195,9 +187,7 @@ export const PerformanceBenchmark: React.FC<PerformanceBenchmarkProps> = ({ onOp
               </div>
             </div>
 
-            <div className={`mt-8 pt-6 border-t ${
-              isDark ? 'border-neutral-800' : 'border-slate-200'
-            }`}>
+            <div className="mt-8 pt-6 border-t border-neutral-800">
               <button
                 onClick={onOpenConsultation}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF5E14] py-3.5 text-xs font-semibold text-white shadow-lg transition-all hover:bg-[#e0520f]"
